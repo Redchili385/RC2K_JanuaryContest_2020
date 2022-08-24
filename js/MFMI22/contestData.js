@@ -1198,6 +1198,8 @@ function contestData(){
         wr = stage.AddRecord(sBinnala, "05:30.41", "00:00.00", "Yes")
         wr.proofs["image"] = "https://drive.google.com/file/d/1I11sZcYj1wii3WsAraZMG4tn80z53qRV/view?usp=sharing"
         wr.proofs["replay"] = "https://drive.google.com/file/d/1MuSZ7aYWmLccJarigOBJK7Y8iqH0zYgR/view?usp=sharing"
+        wr = stage.AddRecord(SpartaRemixer, "03:13.58", "00:00.00", "No")
+        wr.proofs["image"] = "https://drive.google.com/file/d/1zD76_lS4SLZNwI7zU4nSF9WTu2w28dWA/view?usp=sharing"
         wr = stage.AddRecord(TheKetrab, "04:32.76", "00:00.00", "No")
         wr.proofs["image"] = "https://drive.google.com/file/d/1YVoUAMraWONtceoicVvVbbwug4B60OIZ/view?usp=sharing"
         wr = stage.AddRecord(Tribell, "03:09.89", "00:00.00", "No")
@@ -1224,6 +1226,8 @@ function contestData(){
         wr = stage.AddRecord(sBinnala, "08:59.06", "00:00.00", "Yes")
         wr.proofs["image"] = "https://drive.google.com/file/d/1q8757pQUDQlSYwBreJxDEqLqHk8xoYzQ/view?usp=sharing"
         wr.proofs["replay"] = "https://drive.google.com/file/d/12bPeRy2tgvNH2CaE5IwOkXeQY7ZgaZa9/view?usp=sharing"
+        wr = stage.AddRecord(SpartaRemixer, "08:31.28", "00:00.00", "No")
+        wr.proofs["image"] = "https://drive.google.com/file/d/1KeKliab5UOqP4wCG8RPydVedU3dUMVMe/view?usp=sharing"
         wr = stage.AddRecord(TheKetrab, "08:24.55", "00:00.00", "No")
         wr.proofs["image"] = "https://drive.google.com/file/d/12quEDL7fb4FwMjUB-rZljAxDSQ3SsYmK/view?usp=sharing"
         wr.proofs["replay"] = "https://drive.google.com/file/d/16ozN8mfLkHS5tgZhGuSdVBO4rSgZlEgL/view?usp=sharing"
@@ -1251,6 +1255,9 @@ function contestData(){
         wr = stage.AddRecord(sBinnala, "10:08.72", "00:00.00", "Yes")
         wr.proofs["image"] = "https://drive.google.com/file/d/114_xu-fIBu-p2QBzyuL8PZfztxia-wbK/view?usp=sharing"
         wr.proofs["replay"] = "https://drive.google.com/file/d/1hdOBIXUzJXCs12Q61yJGNMyH45rr3u3x/view?usp=sharing"
+        wr = stage.AddRecord(SpartaRemixer, "09:15.70", "00:00.00", "No")
+        wr.proofs["image"] = "https://drive.google.com/file/d/1Aqrq0ol1pulMdHTc7wusfhWjhRSbF4hO/view?usp=sharing"
+        wr.proofs["youtube"] = "https://www.youtube.com/watch?v=wIqRSqlqfmo"
         wr = stage.AddRecord(TheKetrab, "09:23.56", "00:00.00", "No")
         wr.proofs["image"] = "https://drive.google.com/file/d/16jSXRPLUr_7gwreVTq3kmN-XByLuUFvZ/view?usp=sharing"
         wr.proofs["replay"] = "https://drive.google.com/file/d/1vRS8Jb4NevlIbI4wCy6NKfgBbJBlxoyJ/view?usp=sharing"
