@@ -223,30 +223,9 @@ class Stage{
         const baseDiv = this.CreateStageTable(div)
         const stageTablesDiv = document.createElement('div')
         stageTablesDiv.className = "divStageTables"
-        let orders = ["finalTime"]
-        switch(finalLevel) {
-            case 0: orders = ["finalTime"]; break;
-            case 1: orders = ["finalTime_wcbAdjusted", "points"]; break;
-            case 2: orders = ["points"]; break;
-            case 3: orders = ["finalTime_wcbAdjusted", "points"]; break;
-        }
-        for(const order of orders){
-            ContestRecord.sortBy(this.records, order);
-            if(orders.length > 1){
-                let orderText = "Results ordered by time"
-                if(order == "finalTime_wcbAdjusted") {
-                    orderText = "Results ordered by time (WCB-adjusted)";
-                }
-                if(order == "points"){
-                    orderText = "Results ordered by number of points"
-                }
-                let orderElement =  document.createElement('h5')
-                orderElement.innerHTML = orderText
-                orderElement.className = "orderText"
-                stageTablesDiv.appendChild(orderElement)
-            }
-            this.CreateContestStageTable(stageTablesDiv, finalLevel);
-        }
+        let order = finalLevel === 0 ? "finalTime" : "points";
+        ContestRecord.sortBy(this.records, order);
+        this.CreateContestStageTable(stageTablesDiv, finalLevel);
         baseDiv.appendChild(stageTablesDiv)
     }
     CreateWorldRecordEntireStageTable(div, direction){
