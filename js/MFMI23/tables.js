@@ -310,14 +310,30 @@ class Stage{
             {
                 let record = records[j]
                 let flagImg = `<img src="../../resources/flags/${record.participant.user.country}.png" style="height: 20px; min-width: 32px; border: 1px solid #CCC;"/ >`;
-                let value_lastColumn = finalLevel==0 ? record.gaps.toElement() : record.points.toElement();
-                let proofRow = finalLevel==0 ? `<td>${record.proofs.toElement()}</td>` : ``
-                let finalTimeToDisplay = finalLevel === 3 
-                    ? `${record.finalTime.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}`
-                    : record.status.didFinish ? record.finalTime.formattedTime : record.status.value
-                let finalTimeRow_wcbAdjusted = finalLevel === 0 ? `` : finalLevel === 3
-                    ? `<td>${record.finalTime_wcbAdjusted.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}</td>`
-                    : `<td>${record.status.didFinish ? record.finalTime_wcbAdjusted.formattedTime : record.status.value}</td>`;
+                let value_lastColumn;
+                let proofRow;
+                let finalTimeToDisplay = record.status.didFinish ? record.finalTime.formattedTime : record.status.value;
+                let finalTimeRow_wcbAdjusted;
+                // Single stage
+                if(finalLevel === 0) {
+                    value_lastColumn = record.gaps.toElement();
+                    proofRow = `<td>${record.proofs.toElement()}</td>`;
+                    finalTimeRow_wcbAdjusted = ``;
+                }
+                // Whole rally or contest
+                else {
+                    value_lastColumn = record.points.toElement();
+                    proofRow = ``;
+                    // Contest
+                    if(finalLevel === 3) {
+                        finalTimeToDisplay = `${record.finalTime.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}`;
+                        finalTimeRow_wcbAdjusted = `<td>${record.finalTime_wcbAdjusted.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}</td>`;
+                    }
+                    // Rally
+                    else {
+                        finalTimeRow_wcbAdjusted = `<td>${record.status.didFinish ? record.finalTime_wcbAdjusted.formattedTime : record.status.value}</td>`;
+                    }
+                }
                 let tr = newTableBody.insertRow();
                 let th = document.createElement("th");
                 th.appendChild(document.createTextNode(record.rank));
