@@ -35,32 +35,12 @@ class User{
 }
 
 class Participant{
-    constructor(num, user, color, car, contest){
+    constructor(num, user, color, car){
         this.num = num
         this.user = user
         this.color = color
         this.car = car
         this.group = null
-        this.contest = contest // Contest dependency (this field shouldn't be in this class)
-        switch(car) {
-            case "Mitsubishi Lancer Evo V":
-                this.wcbFactor = 1.05;
-                break;
-            case "Peugeot 206 WRC":
-                this.wcbFactor = 1.04;
-                break;
-            case "Subaru Impreza WRC":
-                this.wcbFactor = 1.03;
-                break;
-            case "Mitsubishi Lancer Evo IV":
-                this.wcbFactor = 1.02;
-                break;
-            case "Seat Cordoba WRC":
-                this.wcbFactor = 1.01;
-                break;
-            default:
-                this.wcbFactor = 1.00;
-        }
     }
 }
 
@@ -227,17 +207,14 @@ class Stage{
         let orders = ["finalTime"]
         switch(finalLevel) {
             case 0: orders = ["finalTime"]; break;
-            case 1: orders = [this.records[0].participant.contest === "MFMI23"  ? "finalTime_wcbAdjusted" : "finalTime", "points"]; break; // Contest dependency
+            case 1: orders = ["finalTime", "points"]; break;
             case 2: orders = ["points"]; break;
-            case 3: orders = [this.records[0].participant.contest === "MFMI23"  ? "finalTime_wcbAdjusted" : "finalTime", "points"]; break; // Contest dependency
+            case 3: orders = ["finalTime", "points"]; break;
         }
         for(const order of orders){
             ContestRecord.sortBy(this.records, order);
             if(orders.length > 1){
                 let orderText = "Results ordered by time"
-                if(order == "finalTime_wcbAdjusted") {
-                    orderText = "Results ordered by time (WCB-adjusted)";
-                }
                 if(order == "points"){
                     orderText = "Results ordered by number of points"
                 }
@@ -283,7 +260,6 @@ class Stage{
         let newTable = document.createElement('table')
         newTable.setAttribute("class", "table")
         let string_lastColumn = finalLevel==0 ? "Gap to Leader":"Points"
-        let weakerCarBonusColumn = this.records[0].participant.contest !== "MFMI23" ? `` : finalLevel==0 ? ``:`<th>Time (WCB-adjusted)</th>`  // Contest dependency
         let proofColumn = finalLevel==0?`<th scope="col">Proofs</th>`:``
         newTable.innerHTML = 
             `<thead class="thead-dark">
@@ -294,7 +270,6 @@ class Stage{
                     <th scope="col">NAT</th>
                     <th scope="col">Group</th>
                     <th scope="col">Time</th>
-                    ${weakerCarBonusColumn}
                     <th scope="col">${string_lastColumn}</th>
                     ${proofColumn}
                 </tr>
@@ -316,9 +291,6 @@ class Stage{
                 let finalTimeToDisplay = finalLevel === 3 
                     ? `${record.finalTime.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}`
                     : record.status.didFinish ? record.finalTime.formattedTime : record.status.value
-                let finalTimeRow_wcbAdjusted = record.participant.contest !== "MFMI23" ? `` : finalLevel === 0 ? `` : finalLevel === 3 // Contest dependency
-                    ? `<td>${record.finalTime_wcbAdjusted.formattedTime} ${RecordStatus.getNotFinishedStatusesString(record.rallyStatuses)}</td>`
-                    : `<td>${record.status.didFinish ? record.finalTime_wcbAdjusted.formattedTime : record.status.value}</td>`;
                 let tr = newTableBody.insertRow();
                 let th = document.createElement("th");
                 th.appendChild(document.createTextNode(record.rank));
@@ -334,7 +306,6 @@ class Stage{
                 td.appendChild(document.createTextNode(record.participant.group.name));
                 td = tr.insertCell();
                 td.appendChild(document.createTextNode(finalTimeToDisplay));
-                tr.innerHTML += finalTimeRow_wcbAdjusted;
                 td = tr.insertCell();
                 td.innerHTML += value_lastColumn;
                 tr.innerHTML += proofRow;
@@ -399,11 +370,10 @@ class Record{
         this.initialTime = initialTime;
         this.penalty = penalty;
         this.status = status;
-        this.finalTime = this.initialTime.add(this.penalty);
-        this.finalTime_wcbAdjusted = this.finalTime.multiply(this.participant.wcbFactor).round();
+        this.finalTime = this.initialTime.add(this.penalty)
         this.gapToLeader = 0;
         this.verified = verified;
-        this.proofs = new ProofsWrapper();
+        this.proofs = new ProofsWrapper()
     }
     static fromUserInput(participant, timeString, penaltyString, verified){
         let initialTime = new Time(0)
@@ -428,15 +398,6 @@ class Record{
             if(!b.status.didFinish)
                 return Number.NEGATIVE_INFINITY
             return (a.finalTime.centiseconds - b.finalTime.centiseconds)
-        })
-    }
-    static sortByFinalTime_wcbAdjusted(records){
-        return records.sort(function (a,b){
-            if(!a.status.didFinish)
-                return Number.POSITIVE_INFINITY
-            if(!b.status.didFinish)
-                return Number.NEGATIVE_INFINITY
-            return (a.finalTime_wcbAdjusted.centiseconds - b.finalTime_wcbAdjusted.centiseconds)
         })
     }
     static assignStageRanks(stageRecords){
@@ -487,62 +448,58 @@ class RallyRecord extends Record{
         return new RallyRecord(record, null)
     }
     static assignPoints(rallyRecords, rallyNumber){
-        const sortedRallyRecords = rallyRecords[0].participant.contest === "MFMI22" // Contest dependency
-            ? Record.sortByFinalTime(rallyRecords.slice())
-            : Record.sortByFinalTime_wcbAdjusted(rallyRecords.slice())
+        const sortedRallyRecords = Record.sortByFinalTime(rallyRecords.slice())
         const numberOfParticipants = rallyRecords.length
         //Base Points
         sortedRallyRecords.forEach((record, index) =>{
-            record.points = new PointsWrapper(numberOfParticipants-index, 0, 0, record.participant.contest)  // Contest dependency (last parameter)
+            record.points = new PointsWrapper(numberOfParticipants-index, 0, 0)
         })
-        if(sortedRallyRecords[0].participant.contest === "MFMI22") { // Contest dependency
-            //Car Points
-            sortedRallyRecords.forEach(record => {
-                const carName = record.participant.car
-                const carBonus = [
-                    'Mitsubishi Lancer Evo IV',
-                    'Seat Cordoba WRC',
-                    'Proton Wira/Persona'
-                ].indexOf(carName) !== -1 ? 1 : 0
-                record.points.add(new PointsWrapper(0, carBonus, 0, record.participant.contest))  // Contest dependency (last parameter)
-            })
-            //Group Points
-            sortedRallyRecords.forEach((record, index) => {
-                const recordGroup = record.participant.group
-                const beatenGroups = {}
-                const worseRecords = sortedRallyRecords.slice(index + 1).filter(record => record.status.didFinish)
-                worseRecords.forEach(worseRecord => {
-                    const beatenGroup = worseRecord.participant.group
-                    if(!(beatenGroup.number in beatenGroups)){
-                        beatenGroups[beatenGroup.number] = beatenGroup
-                    }
-                })
-                let groupPoints = 0
-                for(const beatenGroupNumber in beatenGroups){
-                    const beatenGroup = beatenGroups[beatenGroupNumber]
-                    groupPoints += recordGroup.getPointAdvantage(beatenGroup)
+        //Car Points
+        sortedRallyRecords.forEach(record => {
+            const carName = record.participant.car
+            const carBonus = [
+                'Mitsubishi Lancer Evo IV',
+                'Seat Cordoba WRC',
+                'Proton Wira/Persona'
+            ].indexOf(carName) !== -1 ? 1 : 0
+            record.points.add(new PointsWrapper(0, carBonus, 0))
+        })
+        //Group Points
+        sortedRallyRecords.forEach((record, index) => {
+            const recordGroup = record.participant.group
+            const beatenGroups = {}
+            const worseRecords = sortedRallyRecords.slice(index + 1).filter(record => record.status.didFinish)
+            worseRecords.forEach(worseRecord => {
+                const beatenGroup = worseRecord.participant.group
+                if(!(beatenGroup.number in beatenGroups)){
+                    beatenGroups[beatenGroup.number] = beatenGroup
                 }
-                record.points.add(new PointsWrapper(0, 0, groupPoints, record.participant.contest)) // Contest dependency (last parameter)
             })
-            //Rally Number Points
-            if(rallyNumber === 3){
-                sortedRallyRecords.forEach(rallyRecord => {
-                    const groupNumber = rallyRecord.participant.group.number
-                    let groupMultiplier = 1.5;
-                    switch(groupNumber){
-                        case 1: groupMultiplier = 1.5; break;
-                        case 2: groupMultiplier = 1.5; break;
-                        case 3: groupMultiplier = 2; break;
-                        case 4: groupMultiplier = 2.5; break;
-                    }
-                    rallyRecord.points.multiply(groupMultiplier)
-                })
+            let groupPoints = 0
+            for(const beatenGroupNumber in beatenGroups){
+                const beatenGroup = beatenGroups[beatenGroupNumber]
+                groupPoints += recordGroup.getPointAdvantage(beatenGroup)
             }
+            record.points.add(new PointsWrapper(0, 0, groupPoints))
+        })
+        //Rally Number Points
+        if(rallyNumber === 3){
+            sortedRallyRecords.forEach(rallyRecord => {
+                const groupNumber = rallyRecord.participant.group.number
+                let groupMultiplier = 1.5;
+                switch(groupNumber){
+                    case 1: groupMultiplier = 1.5; break;
+                    case 2: groupMultiplier = 1.5; break;
+                    case 3: groupMultiplier = 2; break;
+                    case 4: groupMultiplier = 2.5; break;
+                }
+                rallyRecord.points.multiply(groupMultiplier)
+            })
         }
         //Did not finish points
         sortedRallyRecords.forEach(rallyRecord => {
             if(!rallyRecord.status.didFinish){
-                rallyRecord.points = new PointsWrapper(0, 0, 0, rallyRecord.participant.contest) // Contest dependency (last parameter)
+                rallyRecord.points = new PointsWrapper(0, 0, 0)
             }
         })
     }
@@ -596,9 +553,6 @@ class ContestRecord extends RallyRecord{
             case "finalTime": return firstRecord instanceof ContestRecord 
                 ? ContestRecord.sortByFinalTime(records)
                 : Record.sortByFinalTime(records);
-            case "finalTime_wcbAdjusted": return firstRecord instanceof ContestRecord 
-                ? ContestRecord.sortByFinalTime_wcbAdjusted(records)
-                : Record.sortByFinalTime_wcbAdjusted(records);
             case "points": return RallyRecord.sortByPoints(records);
         }
     }
@@ -724,14 +678,8 @@ class Time{
     add(otherTime){
         return new Time(this.centiseconds + otherTime.centiseconds)
     }
-    multiply(factor){
-        return new Time(this.centiseconds * factor)
-    }
     sub(otherTime){
         return new Time(this.centiseconds - otherTime.centiseconds)
-    }
-    round(){
-        return new Time(Math.round(this.centiseconds));
     }
     static timeToCentiseconds(time){   //string to int
         let centiseconds = 0;
@@ -831,11 +779,10 @@ class GapsWrapper{
 }
 
 class PointsWrapper{
-    constructor(positionPoints, carPoints, groupPoints, contest){
+    constructor(positionPoints, carPoints, groupPoints){
         this.positionPoints = positionPoints;
         this.carPoints = carPoints;
         this.groupPoints = groupPoints;
-        this.contest = contest; // Contest dependency (this fields shouldn't be in this class)
     }
     getTotalPoints(){
         return this.positionPoints + this.carPoints + this.groupPoints
@@ -847,15 +794,15 @@ class PointsWrapper{
         return this
     }
     static addMany(pointsWrappers){
-        return pointsWrappers.reduce((acc, pointWrapper) => acc.add(pointWrapper), new PointsWrapper(0, 0, 0, this.contest)) // Contest dependency (last parameter)
+        return pointsWrappers.reduce((acc, pointWrapper) => acc.add(pointWrapper), new PointsWrapper(0, 0, 0))
     }
     multiply(number){
         this.positionPoints *= number
         this.carPoints *= number
         this.groupPoints *= number
     }
-    toElement(){ // Contest dependency
-        return this.getTotalPoints() + (this.contest !== "MFMI22" ? `` : ` (<span class="pointsHover">${this.positionPoints}<div class="pointsHint">Base</div></span> + <span class="pointsHover">${this.carPoints}<div class="pointsHint">Weaker car bonus</div></span> + <span class="pointsHover">${this.groupPoints}<div class="pointsHint">Group bonus</div></span>)`)
+    toElement(){
+        return `${this.getTotalPoints()} (<span class="pointsHover">${this.positionPoints}<div class="pointsHint">Base</div></span> + <span class="pointsHover">${this.carPoints}<div class="pointsHint">Weaker car bonus</div></span> + <span class="pointsHover">${this.groupPoints}<div class="pointsHint">Group bonus</div></span>)`
     }
 }
 
