@@ -19,7 +19,7 @@ function contestData(){
     let Migger =        new Participant(23, website.GetUserByName('Migger'),            participantColor(), 'Mitsubishi Lancer Evo IV');
     let SpartaRemixer = new Participant(2,  website.GetUserByName('SpartaRemixerPL'),   participantColor(), 'Subaru Impreza WRC');
     let Ephemeral =     new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Mitsubishi Lancer Evo IV');
-    let XsaraTorrada =  new Participant(27, website.GetUserByName('XsaraTorrada'),      participantColor(), 'Seat Cordoba WRC');
+    let XsaraTorrada =  new Participant(69, website.GetUserByName('XsaraTorrada'),      participantColor(), 'Peugeot 206 WRC');
     let Lewsys =        new Participant(14, website.GetUserByName('Lewsys'),            participantColor(), 'Peugeot 206 WRC');
     let sBinnala =      new Participant(16, website.GetUserByName('sBinnala'),          participantColor(), 'Subaru Impreza WRC');
     let Linotrix =      new Participant(2,  website.GetUserByName('Linotrix'),          participantColor(), 'Mitsubishi Lancer Evo IV');
@@ -34,11 +34,11 @@ function contestData(){
     let Red_T =         new Participant(19, website.GetUserByName('Red_T'),             participantColor(), 'Subaru Impreza WRC');
     let Certare =       new Participant(26, website.GetUserByName('Certāre'),           participantColor(), 'Subaru Impreza WRC');
     let Komuh =         new Participant(27, website.GetUserByName('Komuh'),             participantColor(), 'Subaru Impreza WRC');
-    contest.participants.push(Erwto, Ephemeral, Lewsys, sBinnala, TheKetrab, datsun100aGTR, Tribell, Migger, SpartaRemixer, Red_T, Certare, Komuh, Pendzior);
+    contest.participants.push(Erwto, Ephemeral, Lewsys, sBinnala, TheKetrab, datsun100aGTR, Tribell, Migger, SpartaRemixer, Red_T, Certare, Komuh, Pendzior, XsaraTorrada);
 
     G1.addParticipants([Ephemeral, Komuh, SpartaRemixer, Tribell])
     G2.addParticipants([Pendzior, TheKetrab, Migger, Erwto, Linotrix, Twajlot])
-    G3.addParticipants([XsaraTorrada, KarelPipa, Red_T])
+    G3.addParticipants([XsaraTorrada, KarelPipa, Red_T, XsaraTorrada])
     G4.addParticipants([Woeringen1288, BrosTheThird, datsun100aGTR, Certare, Lewsys, sBinnala])
 
     contest.rallies = website.game.rallies;
