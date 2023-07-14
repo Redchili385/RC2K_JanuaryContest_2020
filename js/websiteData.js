@@ -26,6 +26,8 @@ function websiteData(){
         new User('TheKetrab', "pl"),
         new User('Komuh', "pl"),
         new User('Redchili385', "br"),
+        new User('Red_T', "fr"),
+        new User('Certāre', "pl")
     );
 
     let Spartax = website.GetUserByName("SpartaX18");

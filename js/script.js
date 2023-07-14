@@ -15,13 +15,13 @@ bgRoll();
 
 document.getElementById("title").innerHTML = contest.name
 
-// Compare function for sorting participants by Group (ascending order)
+// Compare function for sorting participants by Group (descending order)
 function compareGroups(participant1, participant2) {
     if (participant1.group.number < participant2.group.number) {
-        return 1;
+        return -1;
     }
     if (participant1.group.number > participant2.group.number) {
-        return -1;
+        return 1;
     }
     return 0;
 }
