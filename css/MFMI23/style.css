@@ -255,6 +255,10 @@ body{
     background-color: rgba(0,0,0,0.8);
 }
 
+#driverProfileImg {
+    width: 640px;
+}
+
 #showModalBtn {
     background-color: #EEE;
     border: 1px solid black;

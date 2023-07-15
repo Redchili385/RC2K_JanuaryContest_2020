@@ -30,7 +30,7 @@ function showDriverProfile(participantName) {
     const participant = contest.getParticipantByName(participantName);
     document.getElementById("modalDriverProfile").style.display = "flex";
     let driverProfileImgFilename = `${participant.group.name}_${participant.user.name}`;
-    document.getElementById("driverProfileImg").setAttribute("src", `../../resources/driver_profiles/${driverProfileImgFilename.toLowerCase().replaceAll(' ','')}.png`);
+    document.getElementById("driverProfileImg").setAttribute("src", `../../resources/driver_profiles/MFMI${contest.name.substr(-2, 2)}/${driverProfileImgFilename.toLowerCase().replaceAll(' ','')}.png`);
 }
 
 function closeModal(event) {

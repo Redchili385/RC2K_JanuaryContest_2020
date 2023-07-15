@@ -13,6 +13,7 @@ function websiteData(){
         new User('sBinnala', "pl"),
         new User('Linotrix', "hr"),
         new User('SpartaRemixerPL', "pl"),
+        new User('SpartaRemixer', "pl"),
         new User('Juraj', "hr"),
         new User('SForman135LS', "cz"),
         new User('Tornado', "unknown"),
@@ -27,7 +28,7 @@ function websiteData(){
         new User('Komuh', "pl"),
         new User('Redchili385', "br"),
         new User('Red_T', "fr"),
-        new User('Certāre', "pl")
+        new User('Certare', "pl")
     );
 
     let Spartax = website.GetUserByName("SpartaX18");
