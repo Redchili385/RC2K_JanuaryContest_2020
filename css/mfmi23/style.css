@@ -510,3 +510,15 @@ canvas.tables{
 .updateRallyWinner {
     text-align: center;
 }
+
+#resultSubmissionForm {
+    background-color: #fff;
+    padding: 10px;
+    margin: 0 150px 20px 150px;
+    border: 10px solid #343a40;
+}
+
+#submitResult {
+    border: none;
+    background: none;
+}

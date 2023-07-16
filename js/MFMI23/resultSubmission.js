@@ -158,9 +158,21 @@ function generateFormContent(form, currentLeg) {
         form.appendChild(fieldset_stage);
     });
 
+    // Submit button
     const button_submit = document.createElement("button");
-    setAttributes(button_submit, {"id": "submitResult", "class": "submitBtn navspan", "type": "submit"});
-    button_submit.textContent = "Submit";
+    const img_leftArrow = document.createElement("img");
+    const img_rightArrow = document.createElement("img");
+    const navspan = document.createElement("span");
+    
+    setAttributes(button_submit, {"id": "submitResult", "class": "submitBtn", "type": "submit", "onmouseover": "turnButtonRed(this)", "onmouseout": "turnButtonWhite(this)"});
+    setAttributes(img_leftArrow, {"class": "leftArrow", "src": '../../resources/navleft.png'});
+    setAttributes(navspan, {"id": "submit_result", "class": "navspan"});
+    setAttributes(img_rightArrow, {"class": "rightArrow", "src": '../../resources/navright.png'});
+
+    navspan.textContent = "Submit";
+    button_submit.appendChild(img_leftArrow);
+    button_submit.appendChild(navspan);
+    button_submit.appendChild(img_rightArrow);
     form.appendChild(button_submit);
 }
 
