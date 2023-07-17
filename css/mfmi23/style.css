@@ -92,7 +92,7 @@ body{
     background-color: white;
     padding: 0;
     cursor: pointer;
-    margin: 10px;
+    margin: 30px;
     transition: transform 0.5s;
 }
 
@@ -119,8 +119,8 @@ body{
 
 .book {
     position: relative;
-    width: 525px;
-    height: 750px;
+    width: 595px;
+    height: 850px;
     transition: transform 0.5s;
 }
 
