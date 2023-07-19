@@ -59,7 +59,7 @@ body{
     text-decoration: none;
 }
 
-.navspan{
+.navspan {
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
@@ -71,7 +71,7 @@ body{
     color: yellow;
 }
 
-#nav button{
+#nav button {
     padding: 0;
     border: none;
     background: none;
@@ -293,7 +293,7 @@ body{
     color: #CCC;
 }
 
-#buttons{
+#buttons {
     margin: 0 150px 10px 150px;
     display: flex;
     align-items: stretch;
@@ -301,18 +301,18 @@ body{
     font-family: "Trebuchet MS";
 }
 
-#buttons button{
+#buttons button {
     border-radius: 50vh;
     font-weight: 600;
     margin: 0px 3px;
     background: linear-gradient(45deg, white 33.3%, #DDD 66.7%, #BBB 100%);
 }
 
-#buttons button:hover{
+#buttons button:hover {
     background: linear-gradient(45deg, #BBB 33.3%, #DDD 66.7%, white 100%);
 }
 
-.tables{
+.tables {
     background-color: rgba(52,58,64,0.75);
     padding: 10px 10px 10px 10px;
     font-size: 1vw;
@@ -320,7 +320,7 @@ body{
 }
 
 
-.tables table{
+.tables table {
     background-color: #FFF;
     margin-bottom: 0px;
     padding-right: 10px;
@@ -414,7 +414,7 @@ body{
     margin-bottom: 0;
 }
 
-.divStage{
+.divStage {
     vertical-align: top;
     display: inline-flex;
     background: #343a40;
@@ -423,25 +423,25 @@ body{
     width: 100%;
 }
 
-.divStageTables{
+.divStageTables {
     flex-direction: column;
     width: 100%;
 }
 
-.orderText{
+.orderText {
     padding: 10px 0px 10px 0px;
 }
 
-h1, h2, h3, h4, h5, h6{
+h1, h2, h3, h4, h5, h6 {
     color: white;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
-.stageName{
+.stageName {
     font-size: 1.7em;
 }
 
-.divTitleImage{
+.divTitleImage {
     width: 30%;
     display: inline-block;
     padding: 1vw;
@@ -450,11 +450,11 @@ h1, h2, h3, h4, h5, h6{
     font-style: italic;
 }
 
-.mapImage{
+.mapImage {
     width: 100%;
 }
 
-canvas.tables{
+canvas.tables {
     width: 80% !important;
     display: initial !important;
     background-color: white;
@@ -513,7 +513,8 @@ canvas.tables{
 
 /* Result submission form */
 #resultSubmissionForm {
-    margin: 0 150px 20px 150px;
+    width: 480px;
+    margin: 0 auto 20px auto;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -521,16 +522,19 @@ canvas.tables{
     border: 10px solid #343a40;
 }
 
-#resultSubmissionForm > * {
-    margin: 0 auto;
-}
-
-#currentLegHeader {
+#resultSubmissionFormHeader {
     width: 100%;
     padding-top: 8px;
     padding-bottom: 18px;
     background-color: #343a40;
+}
+
+#resultSubmissionFormHeader > * {
     font-weight: bold;
+}
+
+#resultSubmissionForm > * {
+    margin: 0 auto;
 }
 
 .fieldset_stage {
@@ -546,7 +550,7 @@ canvas.tables{
 
 .legend_stage {
     width: auto;
-    margin: 0;
+    margin: 0 0 -8px 0; /* Mitigate the unwanted 8px flex gap */
     padding: 0 8px;
     font-weight: bold;
 }

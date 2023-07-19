@@ -26,8 +26,10 @@
                 <li onmouseover="turnButtonRed(this)" onmouseout="turnButtonWhite(this)"><a href="submit_results.html"><img class="leftArrow" src='../../resources/navleft.png'><span id="submit_results" class="navspan">Submit results</span><img class="rightArrow" src='../../resources/navright.png'></a></li>   
             </ul>
         </div>
-        <form id="resultSubmissionForm">
-            <h3 id="currentLegHeader">The contest is currently inactive.</h3>
+        <form name="resultSubmissionForm" id="resultSubmissionForm" onsubmit="return validateResultSubmissionForm()">
+            <div id = "resultSubmissionFormHeader">
+                <h3 id="currentLegHeader">The contest is currently inactive.</h3>
+            </div>
         </form>
         <link rel="stylesheet" href="../../css/mfmi23/style.css">
         <script type="text/javascript" src=../../js/auxiliarFunctions.js></script>

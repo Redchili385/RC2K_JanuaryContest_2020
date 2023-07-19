@@ -46,7 +46,7 @@ function formSetup() {
             stages: ["Ae"]
         },
         {
-            date: new Date("2023-08-18"),
+            date: new Date("2023-07-19"),
             stages: ["Moon and Star", "Bothwell", "Whitchester"]
         },
         {
@@ -62,7 +62,7 @@ function formSetup() {
             stages: ["Feeney", "Parkanaur"]
         },
         {
-            date: new Date("2023-07-19"),
+            date: new Date("2023-08-22"),
             stages: ["Lisnamuck", "Tardree"]
         },
         {
@@ -84,8 +84,8 @@ function formSetup() {
 
 // Checks if two dates are on the same day (UNIX timestamp)
 function isSameDay(date1, date2) {
-    let differenceInMilliseconds = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate()) - Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
-    let differenceInDays = Math.floor(differenceInMilliseconds/1000/60/60/24);
+    const differenceInMilliseconds = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate()) - Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    const differenceInDays = Math.floor(differenceInMilliseconds/1000/60/60/24);
     return differenceInDays === 0;
 }
 
@@ -99,13 +99,18 @@ function checkCurrentLeg(schedule) {
         console.log("Something went wrong! Ensure the schedule is correct!");
     }
     else if(currentLeg.length === 1) {
+        const currentLegSubheader = document.createElement("h5");
+        currentLegSubheader.setAttribute("id", "currentLegSubheader");
+
         currentLeg = currentLeg[0];
-        let currentLegStages = currentLeg.stages;
-        currentLegHeader.textContent = "Current leg: ";
-        currentLegHeader.textContent += currentLegStages[0];
+        const currentLegStages = currentLeg.stages;
+        
+        currentLegHeader.textContent = "Current leg";
+        currentLegSubheader.textContent += currentLegStages[0];
         for(let stage_no = 1; stage_no < currentLegStages.length; stage_no++) {
-            currentLegHeader.textContent += (", " + currentLegStages[stage_no]);
+            currentLegSubheader.textContent += (", " + currentLegStages[stage_no]);
         }
+        currentLegHeader.parentNode.appendChild(currentLegSubheader);
         return currentLeg;
     }
     return null;
@@ -117,7 +122,7 @@ function generateFormContent(form, currentLeg) {
     const select_driver = document.createElement("select");
 
     setAttributes(field_driver, {"id": "field_driver", "class": "formField"});
-    setAttributes(label_driver, {"id": "label_driver"});
+    setAttributes(label_driver, {"id": "label_driver", "for": "select_driver"});
     setAttributes(select_driver, {"id": "select_driver"});
 
     label_driver.textContent = "Driver";
@@ -127,7 +132,7 @@ function generateFormContent(form, currentLeg) {
     const contest = contestData();
     contest.participants.forEach(participant => {
         const select_driver_option = document.createElement("option");
-        setAttributes(select_driver_option, {"id": "select_driver_option_" + participant.user.name, "class": "select_driver_option", "required": "true"});
+        setAttributes(select_driver_option, {"id": "select_driver_option_" + participant.user.name, "class": "select_driver_option", "value": participant.user.name, "required": "true"});
         select_driver_option.textContent = participant.user.name;
         select_driver.appendChild(select_driver_option);
         field_driver.appendChild(select_driver);
@@ -182,8 +187,8 @@ function generateFormContent(form, currentLeg) {
         field_time.appendChild(field_time_cs);
         fieldset_stage.appendChild(legend_stage);
         fieldset_stage.appendChild(field_time);
-        fieldset_stage.appendChild(field_twitchLink);
         fieldset_stage.appendChild(field_replayFile);
+        fieldset_stage.appendChild(field_twitchLink);
         fieldset_stage.appendChild(field_youtubeLink);
         fieldset_stage.appendChild(field_timeImage);
         form.appendChild(fieldset_stage);
@@ -205,6 +210,10 @@ function generateFormContent(form, currentLeg) {
     button_submit.appendChild(navspan);
     button_submit.appendChild(img_rightArrow);
     form.appendChild(button_submit);
+
+    Array.from(form.getElementsByTagName("input")).forEach(element => {
+        element.setAttribute("onchange", "resetValidationHighlight(this)");
+    });
 }
 
 // Generic form field factory
@@ -248,6 +257,32 @@ function displayInputFileName(fileInput) {
     if(fileInput.files.length === 1) {
         fileInput.parentNode.querySelector(".p_fileName").textContent = fileInput.files[0].name;
     }
+}
+
+function validateResultSubmissionForm() {
+    const form = document.forms["resultSubmissionForm"];
+    const stages = form.getElementsByClassName("legend_stage");
+    const replayFiles = form.getElementsByClassName("input_replayFile");
+    const twitchLinks = form.getElementsByClassName("input_twitchLink");
+    const ytLinks = form.getElementsByClassName("input_ytLink");
+    let validationSuccessful = true;
+    for(let stageNo = 0; stageNo < replayFiles.length; stageNo++) {
+        if(replayFiles[stageNo].files.length === 0 && twitchLinks[stageNo].value.length === 0 && ytLinks[stageNo].value.length === 0) {
+            replayFiles[stageNo].parentNode.querySelector(".uploadBtn_replayFile").style.borderColor = "red";
+            twitchLinks[stageNo].style.borderColor = "red";
+            ytLinks[stageNo].style.borderColor = "red";
+            validationSuccessful = false;
+            alert(stages[stageNo].textContent + " has no proof material attached. Please provide one of the following: a replay file, a Twitch link or a YouTube link");
+        }
+    }
+    return validationSuccessful;
+}
+
+function resetValidationHighlight(input) {
+    if(input.type === "file") {
+        input = input.parentNode.querySelector(".uploadBtn");
+    }
+    input.style.borderColor = "initial";
 }
 
 // Set multiple attributes of an element by passing an object of attributes
