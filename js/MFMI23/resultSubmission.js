@@ -1,3 +1,17 @@
+const firebaseConfig = {
+    apiKey: "AIzaSyD2XyyGabPr2y_VWHMJtzJ1CEztKTEqRHQ",
+    authDomain: "mfmi23.firebaseapp.com",
+    projectId: "mfmi23",
+    storageBucket: "mfmi23.appspot.com",
+    messagingSenderId: "900627906509",
+    appId: "1:900627906509:web:c28d9579288c3e27cdce84"
+};
+firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+const db = firestore.collection("results");
+
+formSetup();
+
 function formSetup() {
     // Should probably move this to contestData...
     const schedule = [
@@ -214,6 +228,34 @@ function generateFormContent(form, currentLeg) {
     Array.from(form.getElementsByTagName("input")).forEach(element => {
         element.setAttribute("onchange", "resetValidationHighlight(this)");
     });
+
+    button_submit.addEventListener("click", event => {
+        // Insert document into database
+        const formValidated = validateResultSubmissionForm();
+        if(formValidated) {
+            const select_driver = document.getElementById("select_driver");
+            const stageFieldsets = form.getElementsByClassName("fieldset_stage");
+            Array.from(stageFieldsets).forEach(fieldset => {
+                db.doc().set({
+                    participant_name: select_driver.options[select_driver.selectedIndex].text,
+                    replay_file: "test", // to-do: convert to blob... or something...
+                    service_area_img: "test",
+                    stage: fieldset.getElementsByClassName("legend_stage")[0].textContent,
+                    time_img: "test",
+                    time_cs: fieldset.getElementsByClassName("input_timeMin")[0].value * 6000 + fieldset.getElementsByClassName("input_timeSec")[0].value * 100 + fieldset.getElementsByClassName("input_timeCS")[0].value,
+                    twitch_link: fieldset.getElementsByClassName("input_twitchLink")[0].value,
+                    yt_link: fieldset.getElementsByClassName("input_ytLink")[0].value
+                }).then(() => {
+                    console.log("Submission successful!");
+                }).catch((error) => {
+                    alert("Something went wrong! Please try again.");
+                    console.log(error);
+                    return;
+                });
+            });
+            alert("Submission successful!");
+        }
+    });
 }
 
 // Generic form field factory
@@ -301,5 +343,3 @@ function addLeadingZero(input) {
         input.value = input.value.toString().substr(-2, 2);
     }
 }
-
-formSetup();
