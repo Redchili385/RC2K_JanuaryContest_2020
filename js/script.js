@@ -55,7 +55,7 @@ for(let i=0; i<contest.participants.length; i++) {
             <td>${flagImg}</td>
             <td>${participant.group.getName()}</td>
             <td>${participant.car}</td>
-            <td><button id="showModalBtn" onClick='showDriverProfile("${participant.user.name}")'>Show</button></td>
+            <td><button id="showModalBtn" class = "altBtn" onClick='showDriverProfile("${participant.user.name}")'>Show</button></td>
         </tr>`
     }
 }

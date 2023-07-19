@@ -259,21 +259,21 @@ body{
     width: 640px;
 }
 
-#showModalBtn {
+.altBtn {
     background-color: #EEE;
     border: 1px solid black;
     border-radius: 8px;
 }
 
-#showModalBtn:focus {
+.altBtn:focus {
     outline: none;
 }
 
-#showModalBtn:hover {
+.altBtn:hover {
     background-color: #CCC;
 }
 
-#showModalBtn:active {
+.altBtn:active {
     
     background-color: #AAA;
 }
@@ -511,14 +511,99 @@ canvas.tables{
     text-align: center;
 }
 
+/* Result submission form */
 #resultSubmissionForm {
-    background-color: #fff;
-    padding: 10px;
     margin: 0 150px 20px 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #fff;
     border: 10px solid #343a40;
 }
 
+#resultSubmissionForm > * {
+    margin: 0 auto;
+}
+
+#currentLegHeader {
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 18px;
+    background-color: #343a40;
+    font-weight: bold;
+}
+
+.fieldset_stage {
+    width: fit-content;
+    padding: revert;
+    border: 2px double #333;
+    border-radius: 16px;
+}
+
+.fieldset_stage, #field_driver {
+    width: 400px;
+}
+
+.legend_stage {
+    width: auto;
+    margin: 0;
+    padding: 0 8px;
+    font-weight: bold;
+}
+
 #submitResult {
+    margin-bottom: 16px;
     border: none;
     background: none;
+}
+
+.fieldset_stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.formField {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.formField label {
+    font-size: 0.9rem;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.formField input {
+    width: 100%;
+    padding: 1px 6px;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.time {
+    width: 100%;
+    display: flex;
+    align-items: end;
+}
+
+.time > .formField {
+    margin: 0;
+}
+
+.time > span {
+    padding: 0 1px 3px 1px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.uploadBtn {
+    width: min-content;
+    cursor: pointer;
+    padding: 1px 6px;
 }

@@ -63,7 +63,7 @@ function formSetup() {
             stages: ["Feeney", "Parkanaur"]
         },
         {
-            date: new Date("2023-08-22"),
+            date: new Date("2023-07-19"),
             stages: ["Lisnamuck", "Tardree"]
         },
         {
@@ -71,7 +71,7 @@ function formSetup() {
             stages: ["Port Soderick", "Ballagyr", "Curraghs"]
         },
         {
-            date: new Date("2023-07-16"),
+            date: new Date("2023-08-24"),
             stages: ["Tholt-y-Will", "Injerbreck", "Cringle"]
         }
     ];
@@ -113,7 +113,7 @@ function checkCurrentLeg(schedule) {
 }
 
 function generateFormContent(form, currentLeg) {
-    const field_driver = generateFormField("Driver", "driver", "driver", "text");
+    const field_driver = generateFormField("Driver", "driver", "driver", "text", "Shaun Southern");
 
     form.appendChild(field_driver);
 
@@ -122,23 +122,36 @@ function generateFormContent(form, currentLeg) {
         const fieldset_stage = document.createElement("fieldset");
         const legend_stage = document.createElement("legend");
         const field_time = document.createElement("div");
-        const field_time_min = generateFormField("MM", "timeMin_" + stage, "timeMin", "number");
+        const field_time_min = generateFormField("Time", "timeMin_" + stage, "timeMin", "number", "MM");
         const span_timeSeparator_minSec = document.createElement("span");
-        const field_time_sec = generateFormField("SS", "timeSec_" + stage, "timeSec", "number");
+        const field_time_sec = generateFormField("", "timeSec_" + stage, "timeSec", "number", "SS");
         const span_timeSeparator_secCS = document.createElement("span");
-        const field_time_cs = generateFormField("CS", "timeCS_"  + stage, "timeCS", "number");
-        const field_twitchLink = generateFormField("Twitch Link", "twitchLink_" + stage, "twitchLink", "text");
-        const field_replayFile = generateFormField("Replay File", "replayFile_" + stage, "replayFile", "file");
-        const field_youtubeLink = generateFormField("Youtube Link", "ytLink_" + stage, "ytLink", "text");
-        const field_timeImage = generateFormField("Time Image", "timeImage_" + stage, "timeImage", "file");
+        const field_time_cs = generateFormField("", "timeCS_"  + stage, "timeCS", "number", "CS");
+        const field_twitchLink = generateFormField("Twitch Link", "twitchLink_" + stage, "twitchLink", "text", "https://www.twitch.tv/videos/1820025316");
+        const field_replayFile = generateFormField("Replay File", "replayFile_" + stage, "replayFile", "file", "");
+        const field_youtubeLink = generateFormField("Youtube Link", "ytLink_" + stage, "ytLink", "text", "https://youtu.be/dQw4w9WgXcQ");
+        const field_timeImage = generateFormField("Time Image", "timeImage_" + stage, "timeImage", "file", "");
+        const input_time_min = field_time_min.getElementsByTagName("input")[0];
+        const input_time_sec = field_time_sec.getElementsByTagName("input")[0];
+        const input_time_cs = field_time_cs.getElementsByTagName("input")[0];
+        const input_timeImage = field_timeImage.getElementsByTagName("input")[0];
 
-        setAttributes(field_time_min.getElementsByTagName("input")[0], {"min": "0", "max": "99", value: "00", "oninput": "addLeadingZero(this)"});
-        setAttributes(span_timeSeparator_minSec, {"id": "span_timeSeparator_minSec_" + stage, "class": "span_timeSeparator_minSec"});
-        setAttributes(field_time_sec.getElementsByTagName("input")[0], {"min": "0", "max": "59", value: "00", "oninput": "addLeadingZero(this)"});
-        setAttributes(span_timeSeparator_secCS, {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator_secCS"});
-        setAttributes(field_time_cs.getElementsByTagName("input")[0], {"min": "0", "max": "99", value: "00", "oninput": "addLeadingZero(this)"});
         setAttributes(fieldset_stage, {"id": "fieldset_" + stage, "class": "fieldset_stage"});
         setAttributes(legend_stage, {"id": "legend_" + stage, "class": "legend_stage"});
+        setAttributes(field_time, {"id": "time_" + stage, "class": "time"});
+        setAttributes(input_time_min, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(span_timeSeparator_minSec, {"id": "span_timeSeparator_minSec_" + stage, "class": "span_timeSeparator span_timeSeparator_minSec"});
+        setAttributes(input_time_sec, {"min": "0", "max": "59", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(span_timeSeparator_secCS, {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
+        setAttributes(input_time_cs, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(input_timeImage, {"accept": "image/*"});
+
+        field_time_min.classList.add("field_time");
+        field_time_sec.classList.add("field_time");
+        field_time_cs.classList.add("field_time");
+        input_time_min.classList.add("input_time");
+        input_time_sec.classList.add("input_time");
+        input_time_cs.classList.add("input_time");
         
         legend_stage.textContent = stage;
         span_timeSeparator_minSec.textContent = ":";
@@ -149,12 +162,12 @@ function generateFormContent(form, currentLeg) {
         field_time.appendChild(field_time_sec);
         field_time.appendChild(span_timeSeparator_secCS);
         field_time.appendChild(field_time_cs);
+        fieldset_stage.appendChild(legend_stage);
         fieldset_stage.appendChild(field_time);
         fieldset_stage.appendChild(field_twitchLink);
         fieldset_stage.appendChild(field_replayFile);
         fieldset_stage.appendChild(field_youtubeLink);
         fieldset_stage.appendChild(field_timeImage);
-        form.appendChild(legend_stage);
         form.appendChild(fieldset_stage);
     });
 
@@ -176,18 +189,25 @@ function generateFormContent(form, currentLeg) {
     form.appendChild(button_submit);
 }
 
-function generateFormField(labelText, domId, domClass, inputType) {
+// Generic form field factory
+function generateFormField(labelText, domId, domClass, inputType, placeholder) {
     const field = document.createElement("div");
     const label = document.createElement("label");
     const input = document.createElement("input");
 
-    setAttributes(field, {"id": "field_" + domId, "class": "field_" + domClass});
+    setAttributes(field, {"id": "field_" + domId, "class": "formField field_" + domClass});
     setAttributes(label, {"id": "label_" + domId, "class": "label_" + domClass, "for": "input_" + domId});
-    setAttributes(input, {"id": "input_" + domId, "class": "input_" + domClass, "type": inputType});
+    setAttributes(input, {"id": "input_" + domId, "class": "input_" + domClass, "type": inputType, "placeholder": placeholder});
 
     label.textContent = labelText;
 
     field.appendChild(label);
+    if(inputType === "file") {
+        const altButton = document.createElement("label");
+        setAttributes(altButton, {"id": "uploadBtn_" + domId, "class": "altBtn uploadBtn uploadBtn_" + domClass, "for": "input_" + domId});
+        altButton.textContent = "Upload";
+        field.appendChild(altButton);
+    }
     field.appendChild(input);
 
     return field;
@@ -201,11 +221,11 @@ function setAttributes(element, attributes) {
 }
 
 function addLeadingZero(input) {
-    if(input.value >= 0 && input.value < 10) {
+    if(input.value.toString().length === 1) {
         input.value = "0" + input.value.toString();
     }
     // Prevent more than 2 digits (manual input)
-    if(input.value.toString().length > 2) {
+    else if(input.value.toString().length > 2) {
         input.value = input.value.toString().substr(-2, 2);
     }
 }
