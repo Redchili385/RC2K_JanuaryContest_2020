@@ -1,4 +1,4 @@
-contest = contestData();
+const contest = contestData();
 
 currentWrDirection = "arcade";
 currentRallyId = 0;

@@ -1,4 +1,4 @@
-contest = contestData();
+const contest = contestData();
 
 console.log("Reading script.js")
 console.log(contest)

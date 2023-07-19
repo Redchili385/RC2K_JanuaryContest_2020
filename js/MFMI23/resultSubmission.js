@@ -1,5 +1,4 @@
 function formSetup() {
-
     // Should probably move this to contestData...
     const schedule = [
         {
@@ -113,7 +112,26 @@ function checkCurrentLeg(schedule) {
 }
 
 function generateFormContent(form, currentLeg) {
-    const field_driver = generateFormField("Driver", "driver", "driver", "text", "Shaun Southern");
+    const field_driver = document.createElement("div");
+    const label_driver = document.createElement("label");
+    const select_driver = document.createElement("select");
+
+    setAttributes(field_driver, {"id": "field_driver", "class": "formField"});
+    setAttributes(label_driver, {"id": "label_driver"});
+    setAttributes(select_driver, {"id": "select_driver"});
+
+    label_driver.textContent = "Driver";
+    field_driver.appendChild(label_driver);
+
+    // Read contest participants and put them in a select list
+    const contest = contestData();
+    contest.participants.forEach(participant => {
+        const select_driver_option = document.createElement("option");
+        setAttributes(select_driver_option, {"id": "select_driver_option_" + participant.user.name, "class": "select_driver_option", "required": "true"});
+        select_driver_option.textContent = participant.user.name;
+        select_driver.appendChild(select_driver_option);
+        field_driver.appendChild(select_driver);
+    })
 
     form.appendChild(field_driver);
 
@@ -196,21 +214,40 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
     const input = document.createElement("input");
 
     setAttributes(field, {"id": "field_" + domId, "class": "formField field_" + domClass});
-    setAttributes(label, {"id": "label_" + domId, "class": "label_" + domClass, "for": "input_" + domId});
+    setAttributes(label, {"id": "label_" + domId, "class": "label_" + domClass});
     setAttributes(input, {"id": "input_" + domId, "class": "input_" + domClass, "type": inputType, "placeholder": placeholder});
 
     label.textContent = labelText;
 
+    if(inputType !== "file") {
+        label.setAttribute("for", "input_" + domId)
+    }
     field.appendChild(label);
     if(inputType === "file") {
+        const altContainer = document.createElement("div");
         const altButton = document.createElement("label");
+        const p_fileName = document.createElement("p");
+
+        setAttributes(altContainer, {"id": "uploadBtnContainer_" + domId, "class": "uploadBtnContainer uploadBtnContainer_" + domClass});
         setAttributes(altButton, {"id": "uploadBtn_" + domId, "class": "altBtn uploadBtn uploadBtn_" + domClass, "for": "input_" + domId});
+        setAttributes(p_fileName, {"id": "p_fileName_" + domId, "class": "p_fileName p_fileName" + domClass});
+        input.setAttribute("onchange", "displayInputFileName(this)");
+
         altButton.textContent = "Upload";
-        field.appendChild(altButton);
+        altContainer.appendChild(altButton);
+        altContainer.appendChild(p_fileName);
+
+        field.appendChild(altContainer);
     }
     field.appendChild(input);
 
     return field;
+}
+
+function displayInputFileName(fileInput) {
+    if(fileInput.files.length === 1) {
+        fileInput.parentNode.querySelector(".p_fileName").textContent = fileInput.files[0].name;
+    }
 }
 
 // Set multiple attributes of an element by passing an object of attributes

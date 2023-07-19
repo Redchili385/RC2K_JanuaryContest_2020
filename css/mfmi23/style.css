@@ -577,11 +577,23 @@ canvas.tables{
     margin-bottom: 0;
 }
 
-.formField input {
+.formField input, #select_driver {
     width: 100%;
     padding: 1px 6px;
     border: 1px solid black;
+}
+
+.formField input {
     border-radius: 8px;
+}
+
+#select_driver {
+    border-radius: 8px 8px 0 0;
+}
+
+#select_driver option:last-of-type {
+    border-radius: 0 0 8px 8px;
+    border: 15px black solid;
 }
 
 .time {
@@ -606,4 +618,23 @@ input[type="file"] {
     width: min-content;
     cursor: pointer;
     padding: 1px 6px;
+}
+
+.formField label:not(.uploadBtn) {
+    width: fit-content;
+    cursor: text;
+}
+
+.uploadBtnContainer {
+    text-align: left;
+}
+
+.p_fileName {
+    margin: 0 0 0 4px;
+    display: inline-block;
+    font-size: 0.8rem;
+}
+
+#select_driver {
+    width: 100%;
 }
