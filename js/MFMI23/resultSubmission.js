@@ -230,22 +230,27 @@ function generateFormContent(form, currentLeg) {
     form.appendChild(button_submit);
 
     Array.from(form.getElementsByTagName("input")).forEach(element => {
-        element.setAttribute("onchange", "resetValidationHighlight(this)");
+        element.addEventListener("change", resetValidationHighlight);
     });
 
     button_submit.addEventListener("click", event => {
+
         // Insert document into database
+        event.preventDefault();
         const formValidated = validateResultSubmissionForm();
         if(formValidated) {
             const select_driver = document.getElementById("select_driver");
             const stageFieldsets = form.getElementsByClassName("fieldset_stage");
+            const participant_name = select_driver.options[select_driver.selectedIndex].text;
+            const ref = firebase.storage().ref();
+            
             Array.from(stageFieldsets).forEach(fieldset => {
+                const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
+
+                // Text data goes to document collection
                 db.doc().set({
-                    participant_name: select_driver.options[select_driver.selectedIndex].text,
-                    replay_file: "test", // to-do: convert to blob... or something...
-                    service_area_img: "test",
-                    stage: fieldset.getElementsByClassName("legend_stage")[0].textContent,
-                    time_img: "test",
+                    participant_name: participant_name,
+                    stage: stage,
                     time_cs: fieldset.getElementsByClassName("input_timeMin")[0].value * 6000 + fieldset.getElementsByClassName("input_timeSec")[0].value * 100 + fieldset.getElementsByClassName("input_timeCS")[0].value,
                     twitch_link: fieldset.getElementsByClassName("input_twitchLink")[0].value,
                     yt_link: fieldset.getElementsByClassName("input_ytLink")[0].value
@@ -255,6 +260,36 @@ function generateFormContent(form, currentLeg) {
                     alert("Something went wrong! Please try again.");
                     console.log(error);
                     return;
+                });
+
+                // Files go to storage
+                const replay_file = {
+                    data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
+                    for: "replay"
+                }
+                const time_img = {
+                    data: fieldset.getElementsByClassName("input_timeImage")[0].files[0],
+                    for: "time"
+                }
+                const service_area_img = {
+                    data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
+                    for: "serviceArea"
+                }
+                const files = [replay_file, time_img, service_area_img];
+                files.forEach(file => {
+                    if(file.data != undefined) {
+                        const fileName = stage + "_" + participant_name + "_" + file.for;
+                        const metadata = {
+                            contentType: file.type
+                        };
+                        const task = ref.child(fileName).put(file.data, metadata);
+                        task.then(snapshot => snapshot.ref.getDownloadURL())
+                            .then(url => {
+                                console.log(url);
+                                alert('image uploaded successfully');
+                            })
+                            .catch(console.error);
+                    }
                 });
             });
             alert("Submission successful!");
@@ -286,7 +321,7 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
         setAttributes(altContainer, {"id": "uploadBtnContainer_" + domId, "class": "uploadBtnContainer uploadBtnContainer_" + domClass});
         setAttributes(altButton, {"id": "uploadBtn_" + domId, "class": "altBtn uploadBtn uploadBtn_" + domClass, "for": "input_" + domId});
         setAttributes(p_fileName, {"id": "p_fileName_" + domId, "class": "p_fileName p_fileName" + domClass});
-        input.setAttribute("onchange", "displayInputFileName(this)");
+        input.addEventListener("change", displayInputFileName);
 
         altButton.textContent = "Upload";
         altContainer.appendChild(altButton);
@@ -299,7 +334,8 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
     return field;
 }
 
-function displayInputFileName(fileInput) {
+function displayInputFileName(event) {
+    const fileInput = event.target;
     if(fileInput.files.length === 1) {
         fileInput.parentNode.querySelector(".p_fileName").textContent = fileInput.files[0].name;
     }
@@ -324,7 +360,8 @@ function validateResultSubmissionForm() {
     return validationSuccessful;
 }
 
-function resetValidationHighlight(input) {
+function resetValidationHighlight(event) {
+    let input = event.target;
     if(input.type === "file") {
         input = input.parentNode.querySelector(".uploadBtn");
     }
