@@ -2,7 +2,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyD2XyyGabPr2y_VWHMJtzJ1CEztKTEqRHQ",
     authDomain: "mfmi23.firebaseapp.com",
     projectId: "mfmi23",
-    storageBucket: "mfmi23.appspot.com",
+    storageBucket: "gs://mfmi23.appspot.com",
     messagingSenderId: "900627906509",
     appId: "1:900627906509:web:c28d9579288c3e27cdce84"
 };
@@ -56,11 +56,11 @@ function formSetup() {
             stages: ["Black Loch", "Glentrool"]
         },
         {
-            date: new Date("2023-08-17"),
+            date: new Date("2023-07-20"),
             stages: ["Ae"]
         },
         {
-            date: new Date("2023-07-20"),
+            date: new Date("2023-08-18"),
             stages: ["Moon and Star", "Bothwell", "Whitchester"]
         },
         {
@@ -277,16 +277,15 @@ function generateFormContent(form, currentLeg) {
                 }
                 const files = [replay_file, time_img, service_area_img];
                 files.forEach(file => {
-                    if(file.data != undefined) {
-                        const fileName = stage + "_" + participant_name + "_" + file.for;
+                    if(file.data) {
+                        const fileName = stage + "/" + participant_name + "/" + file.for;
                         const metadata = {
-                            contentType: file.type
+                            contentType: file.data.type
                         };
                         const task = ref.child(fileName).put(file.data, metadata);
                         task.then(snapshot => snapshot.ref.getDownloadURL())
                             .then(url => {
-                                console.log(url);
-                                alert('image uploaded successfully');
+                                alert('image uploaded successfully to ' + url);
                             })
                             .catch(console.error);
                     }
