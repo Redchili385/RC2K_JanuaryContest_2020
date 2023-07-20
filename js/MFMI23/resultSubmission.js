@@ -60,7 +60,7 @@ function formSetup() {
             stages: ["Ae"]
         },
         {
-            date: new Date("2023-07-19"),
+            date: new Date("2023-07-20"),
             stages: ["Moon and Star", "Bothwell", "Whitchester"]
         },
         {
@@ -168,10 +168,12 @@ function generateFormContent(form, currentLeg) {
         const field_replayFile = generateFormField("Replay File", "replayFile_" + stage, "replayFile", "file", "");
         const field_youtubeLink = generateFormField("Youtube Link", "ytLink_" + stage, "ytLink", "text", "https://youtu.be/dQw4w9WgXcQ");
         const field_timeImage = generateFormField("Time Image", "timeImage_" + stage, "timeImage", "file", "");
+        const field_serviceAreaImage = generateFormField("Service Area Image", "serviceAreaImage_" + stage, "serviceAreaImage", "file", "");
         const input_time_min = field_time_min.getElementsByTagName("input")[0];
         const input_time_sec = field_time_sec.getElementsByTagName("input")[0];
         const input_time_cs = field_time_cs.getElementsByTagName("input")[0];
         const input_timeImage = field_timeImage.getElementsByTagName("input")[0];
+        const input_serviceAreaImage = field_serviceAreaImage.getElementsByTagName("input")[0];
 
         setAttributes(fieldset_stage, {"id": "fieldset_" + stage, "class": "fieldset_stage"});
         setAttributes(legend_stage, {"id": "legend_" + stage, "class": "legend_stage"});
@@ -182,6 +184,7 @@ function generateFormContent(form, currentLeg) {
         setAttributes(span_timeSeparator_secCS, {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
         setAttributes(input_time_cs, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
         setAttributes(input_timeImage, {"accept": "image/*"});
+        setAttributes(input_serviceAreaImage, {"accept": "image/*"});
 
         field_time_min.classList.add("field_time");
         field_time_sec.classList.add("field_time");
@@ -205,6 +208,7 @@ function generateFormContent(form, currentLeg) {
         fieldset_stage.appendChild(field_twitchLink);
         fieldset_stage.appendChild(field_youtubeLink);
         fieldset_stage.appendChild(field_timeImage);
+        fieldset_stage.appendChild(field_serviceAreaImage);
         form.appendChild(fieldset_stage);
     });
 

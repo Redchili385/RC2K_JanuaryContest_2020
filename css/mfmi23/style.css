@@ -524,8 +524,7 @@ canvas.tables {
 
 #resultSubmissionFormHeader {
     width: 100%;
-    padding-top: 8px;
-    padding-bottom: 18px;
+    padding: 10px 0;
     background-color: #343a40;
 }
 
@@ -535,6 +534,14 @@ canvas.tables {
 
 #resultSubmissionForm > * {
     margin: 0 auto;
+}
+
+#currentLegHeader {
+    margin: 0;
+}
+
+#currentLegSubheader {
+    margin: 10px 0;
 }
 
 .fieldset_stage {
