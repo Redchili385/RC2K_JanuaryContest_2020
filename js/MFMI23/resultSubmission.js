@@ -1,3 +1,4 @@
+const contest = await contestData();
 formSetup();
 
 function formSetup() {
@@ -131,8 +132,7 @@ function generateFormContent(form, currentLeg) {
     field_driver.appendChild(label_driver);
 
     // Read contest participants and put them in a select list
-    const contest = contestData();
-    contest.participants.forEach(participant => {
+    Array.from(contest.participants).forEach(participant => {
         const select_driver_option = document.createElement("option");
         setAttributes(select_driver_option, {"id": "select_driver_option_" + participant.user.name, "class": "select_driver_option", "value": participant.user.name, "required": "true"});
         select_driver_option.textContent = participant.user.name;

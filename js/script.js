@@ -1,7 +1,8 @@
-const contest = contestData();
+const contest = await contestData();
 
 console.log("Reading script.js")
 console.log(contest)
+console.log(contest.participants)
 
 // Roll a random background pic
 function bgRoll() {
