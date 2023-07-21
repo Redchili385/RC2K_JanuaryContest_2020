@@ -8,7 +8,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const firestore = firebase.firestore();
-const db = firestore.collection("results");
 
 formSetup();
 
@@ -254,9 +253,8 @@ function generateFormContent(form, currentLeg) {
                 const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
 
                 // Text data goes to document collection
-                db.doc().set({
-                    participant_name: participant_name,
-                    stage: stage,
+                const db = firestore.collection(stage);
+                db.doc(participant_name).set({
                     time_cs: time_cs,
                     twitch_link: twitch_link,
                     yt_link: yt_link
@@ -293,11 +291,8 @@ function generateFormContent(form, currentLeg) {
                         };
                         const task = ref.child(fileName).put(file.data, metadata);
                         task.then(snapshot => snapshot.ref.getDownloadURL())
-                            // Display success message after the last file has been transferred
-                            .then(() => {
-                                if(fieldset === stageFieldsets[stageFieldsets.length - 1] && file === files[files.length - 1]) {
-                                    alert("Submission successful! Thank you!");
-                                }
+                            .then((url) => {
+                                console.log("File uploaded to " + url);
                             })
                             .catch(console.error);
                     }
