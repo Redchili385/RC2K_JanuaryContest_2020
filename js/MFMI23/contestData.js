@@ -47,6 +47,23 @@ function contestData(){
         rally = contest.rallies[0];  //Vauxall
 
         stage = rally.stages[0]; //Clocaenog
+        contest.participants.forEach(participant => {
+            const firebaseDocRef = firestore.collection(stage.name).doc(participant.user.name);
+            firebaseDocRef.get()
+                .then((doc) => {
+                    if(doc.exists) {
+                        const data = doc.data();
+                        wr = stage.AddRecord(participant, new Time(data.time_cs).formattedTime, new Time(data.time_cs).formattedTime, "No");
+                        console.log(wr);
+                    }
+                    else {
+                        // doc.data() will be undefined in this case
+                        console.log("No such document!");
+                    }
+            }).catch((error) => {
+                console.log("Error getting document:", error);
+            });
+        });
         // wr = stage.AddRecord(BrosTheTird, "DSQ", "DSQ", "No")
         // wr.proofs.add("image", "https://drive.google.com/file/d/1XhODz7YmfjH-VHB6xbc4U7j9Lj32vbns/view?usp=sharing")
         // wr.proofs.add("replay", "https://drive.google.com/file/d/1990kzK7bUjn1sOasFoDsJ2e_9BlQQe41/view?usp=sharing")
