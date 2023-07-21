@@ -228,6 +228,18 @@ function generateFormContent(form, currentLeg) {
     button_submit.appendChild(img_rightArrow);
     form.appendChild(button_submit);
 
+    // Loading icon & success message
+    const loadingIcon = document.createElement("img");
+    const p_successMsg = document.createElement("p");
+
+    setAttributes(loadingIcon, {"id": "loadingIcon", "src": "../../resources/loading.gif", "alt": "Loading..."});
+    setAttributes(p_successMsg, {"id": "successMsg"});
+
+    p_successMsg.textContent = "Submission successful! Thank you!";
+
+    form.insertBefore(loadingIcon, button_submit);
+    form.insertBefore(p_successMsg, button_submit);
+
     Array.from(form.getElementsByTagName("input")).forEach(element => {
         element.addEventListener("change", resetValidationHighlight);
     });
@@ -237,67 +249,87 @@ function generateFormContent(form, currentLeg) {
         // Insert document into database
         event.preventDefault();
         const formValidated = validateResultSubmissionForm();
+
         if(formValidated) {
+            loadingIcon.style.display = "inline";
+            p_successMsg.style.display = "none";
             const select_driver = document.getElementById("select_driver");
             const stageFieldsets = form.getElementsByClassName("fieldset_stage");
             const participant_name = select_driver.options[select_driver.selectedIndex].text;
             const ref = firebase.storage().ref();
             
-            Array.from(stageFieldsets).forEach(fieldset => {
-                const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
-                const time_cs
-                    = fieldset.getElementsByClassName("input_timeMin")[0].value * 6000
-                    + fieldset.getElementsByClassName("input_timeSec")[0].value * 100
-                    + fieldset.getElementsByClassName("input_timeCS")[0].value;
-                const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
-                const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
+            const sendResultsToFirebase = new Promise((resolve, reject) => {
+                const promises = [];
+                Array.from(stageFieldsets).forEach(fieldset => {
+                    const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
+                    const time_cs
+                        = fieldset.getElementsByClassName("input_timeMin")[0].value * 6000
+                        + fieldset.getElementsByClassName("input_timeSec")[0].value * 100
+                        + fieldset.getElementsByClassName("input_timeCS")[0].value;
+                    const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
+                    const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
 
-                // Text data goes to document collection
-                const db = firestore.collection(stage);
-                db.doc(participant_name).set({
-                    time_cs: time_cs,
-                    twitch_link: twitch_link,
-                    yt_link: yt_link
-                }).then(() => {
-                    console.log("Submission successful!");
-                }).catch((error) => {
+                    // Text data goes to document collection
+                    const db = firestore.collection(stage);
+                    const textDataTransferTask = db.doc(participant_name).set({
+                        time_cs: time_cs,
+                        twitch_link: twitch_link,
+                        yt_link: yt_link
+                    }).then(() => {
+                        console.log(stage + " data submission successful!");
+                    }).catch((error) => {
+                        alert("Something went wrong! Please try again.");
+                        console.log(error);
+                        return;
+                    });
+                    promises.push(textDataTransferTask);
+
+                    // Files go to storage
+                    const replay_file = {
+                        data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
+                        for: "replay"
+                    };
+                    const time_imgs = Array.from(fieldset.getElementsByClassName("input_timeImage")[0].files).map(file => ({
+                        data: file,
+                        for: "time"
+                    }));
+                    const service_area_img = {
+                        data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
+                        for: "serviceArea"
+                    };
+                    const files = [replay_file, ...time_imgs, service_area_img];
+                    files.forEach(file => {
+                        // If file was uploaded by the user, put it in the Firebase Storage
+                        if(file.data) {
+                            console.log(file.for);
+                            const fileName = stage + "/" + participant_name + "/" + file.for + "/" + file.data.name;
+                            console.log(fileName);
+                            const metadata = {
+                                contentType: file.data.type
+                            };
+                            const fileTransferTask = ref.child(fileName).put(file.data, metadata);
+                            fileTransferTask.then(snapshot => snapshot.ref.getDownloadURL())
+                                            .then((url) => {
+                                                console.log("File uploaded to " + url);
+                                            })
+                                            .catch(console.error);
+                            promises.push(fileTransferTask);
+                        }
+                    });
+                });
+                Promise.all(promises)
+                .then(() => {
+                    loadingIcon.style.display = "none";
+                    p_successMsg.style.display = "inline";
+                    resolve();
+                })
+                .catch(error => {
                     alert("Something went wrong! Please try again.");
                     console.log(error);
-                    return;
-                });
-
-                // Files go to storage
-                const replay_file = {
-                    data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
-                    for: "replay"
-                };
-                const time_imgs = Array.from(fieldset.getElementsByClassName("input_timeImage")[0].files).map(file => ({
-                    data: file,
-                    for: "time"
-                }));
-                const service_area_img = {
-                    data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
-                    for: "serviceArea"
-                };
-                const files = [replay_file, ...time_imgs, service_area_img];
-                files.forEach(file => {
-                    // If file was uploaded by the user, put it in the Firebase Storage
-                    if(file.data) {
-                        console.log(file.for);
-                        const fileName = stage + "/" + participant_name + "/" + file.for + "/" + file.data.name;
-                        console.log(fileName);
-                        const metadata = {
-                            contentType: file.data.type
-                        };
-                        const task = ref.child(fileName).put(file.data, metadata);
-                        task.then(snapshot => snapshot.ref.getDownloadURL())
-                            .then((url) => {
-                                console.log("File uploaded to " + url);
-                            })
-                            .catch(console.error);
-                    }
+                    reject(error);
                 });
             });
+            sendResultsToFirebase.catch(console.error);
         }
     });
 }

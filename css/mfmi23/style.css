@@ -566,6 +566,7 @@ canvas.tables {
     margin-bottom: 16px;
     border: none;
     background: none;
+    outline: none;
 }
 
 .fieldset_stage {
@@ -652,4 +653,8 @@ input[type="file"] {
 
 #select_driver {
     width: 100%;
+}
+
+#successMsg, #loadingIcon {
+    display: none;
 }
