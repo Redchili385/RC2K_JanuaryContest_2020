@@ -644,6 +644,10 @@ input[type="file"] {
     margin: 0 0 0 4px;
     display: inline-block;
     font-size: 0.8rem;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    overflow: hidden;
+    vertical-align: middle;
 }
 
 #select_driver {

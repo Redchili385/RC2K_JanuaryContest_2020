@@ -56,7 +56,7 @@ function formSetup() {
             stages: ["Black Loch", "Glentrool"]
         },
         {
-            date: new Date("2023-07-20"),
+            date: new Date("2023-08-19"),
             stages: ["Ae"]
         },
         {
@@ -72,7 +72,7 @@ function formSetup() {
             stages: ["Hamilton's Folly", "Tyrones Ditches"]
         },
         {
-            date: new Date("2023-08-21"),
+            date: new Date("2023-07-21"),
             stages: ["Feeney", "Parkanaur"]
         },
         {
@@ -167,7 +167,7 @@ function generateFormContent(form, currentLeg) {
         const field_twitchLink = generateFormField("Twitch Link", "twitchLink_" + stage, "twitchLink", "text", "https://www.twitch.tv/videos/1820025316");
         const field_replayFile = generateFormField("Replay File", "replayFile_" + stage, "replayFile", "file", "");
         const field_youtubeLink = generateFormField("Youtube Link", "ytLink_" + stage, "ytLink", "text", "https://youtu.be/dQw4w9WgXcQ");
-        const field_timeImage = generateFormField("Time Image", "timeImage_" + stage, "timeImage", "file", "");
+        const field_timeImage = generateFormField("Time Image(s)", "timeImage_" + stage, "timeImage", "file", "");
         const field_serviceAreaImage = generateFormField("Service Area Image", "serviceAreaImage_" + stage, "serviceAreaImage", "file", "");
         const input_time_min = field_time_min.getElementsByTagName("input")[0];
         const input_time_sec = field_time_sec.getElementsByTagName("input")[0];
@@ -183,7 +183,7 @@ function generateFormContent(form, currentLeg) {
         setAttributes(input_time_sec, {"min": "0", "max": "59", "oninput": "addLeadingZero(this)", "required": "true"});
         setAttributes(span_timeSeparator_secCS, {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
         setAttributes(input_time_cs, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
-        setAttributes(input_timeImage, {"accept": "image/*"});
+        setAttributes(input_timeImage, {"accept": "image/*", "multiple": "true"});
         setAttributes(input_serviceAreaImage, {"accept": "image/*"});
 
         field_time_min.classList.add("field_time");
@@ -246,14 +246,20 @@ function generateFormContent(form, currentLeg) {
             
             Array.from(stageFieldsets).forEach(fieldset => {
                 const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
+                const time_cs
+                    = fieldset.getElementsByClassName("input_timeMin")[0].value * 6000
+                    + fieldset.getElementsByClassName("input_timeSec")[0].value * 100
+                    + fieldset.getElementsByClassName("input_timeCS")[0].value;
+                const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
+                const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
 
                 // Text data goes to document collection
                 db.doc().set({
                     participant_name: participant_name,
                     stage: stage,
-                    time_cs: fieldset.getElementsByClassName("input_timeMin")[0].value * 6000 + fieldset.getElementsByClassName("input_timeSec")[0].value * 100 + fieldset.getElementsByClassName("input_timeCS")[0].value,
-                    twitch_link: fieldset.getElementsByClassName("input_twitchLink")[0].value,
-                    yt_link: fieldset.getElementsByClassName("input_ytLink")[0].value
+                    time_cs: time_cs,
+                    twitch_link: twitch_link,
+                    yt_link: yt_link
                 }).then(() => {
                     console.log("Submission successful!");
                 }).catch((error) => {
@@ -266,32 +272,37 @@ function generateFormContent(form, currentLeg) {
                 const replay_file = {
                     data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
                     for: "replay"
-                }
-                const time_img = {
-                    data: fieldset.getElementsByClassName("input_timeImage")[0].files[0],
+                };
+                const time_imgs = Array.from(fieldset.getElementsByClassName("input_timeImage")[0].files).map(file => ({
+                    data: file,
                     for: "time"
-                }
+                }));
                 const service_area_img = {
                     data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
                     for: "serviceArea"
-                }
-                const files = [replay_file, time_img, service_area_img];
+                };
+                const files = [replay_file, ...time_imgs, service_area_img];
                 files.forEach(file => {
+                    // If file was uploaded by the user, put it in the Firebase Storage
                     if(file.data) {
-                        const fileName = stage + "/" + participant_name + "/" + file.for;
+                        console.log(file.for);
+                        const fileName = stage + "/" + participant_name + "/" + file.for + "/" + file.data.name;
+                        console.log(fileName);
                         const metadata = {
                             contentType: file.data.type
                         };
                         const task = ref.child(fileName).put(file.data, metadata);
                         task.then(snapshot => snapshot.ref.getDownloadURL())
-                            .then(url => {
-                                alert('image uploaded successfully to ' + url);
+                            // Display success message after the last file has been transferred
+                            .then(() => {
+                                if(fieldset === stageFieldsets[stageFieldsets.length - 1] && file === files[files.length - 1]) {
+                                    alert("Submission successful! Thank you!");
+                                }
                             })
                             .catch(console.error);
                     }
                 });
             });
-            alert("Submission successful!");
         }
     });
 }
@@ -335,9 +346,18 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
 
 function displayInputFileName(event) {
     const fileInput = event.target;
-    if(fileInput.files.length === 1) {
-        fileInput.parentNode.querySelector(".p_fileName").textContent = fileInput.files[0].name;
+    const files = fileInput.files;
+    const p_fileName = fileInput.parentNode.querySelector(".p_fileName");
+    p_fileName.title = "";
+    if(files.length > 0) {
+        p_fileName.textContent = files[0].name;
     }
+    if(files.length > 1) {
+        p_fileName.textContent += "... (" + (files.length - 1) + " more)";
+    }
+    Array.from(files).forEach(file => {
+        p_fileName.title += file.name + "\n";
+    });
 }
 
 function validateResultSubmissionForm() {
