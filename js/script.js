@@ -3,6 +3,7 @@ var localStorageContestResults = localStorage.getItem("results");
 if(localStorageContestResults == null){
       contest.getResultsFromFirebase()
         .then(results => {
+            console.log(results)
                 localStorage.setItem("results", JSON.stringify(results));
                 contest.rallies = results;
                 console.log("Retrieveing results from database...")
@@ -39,7 +40,7 @@ function main(contest) {
                 <td>${participant.num}</td>
                 <td>${participant.user.name}</td>
                 <td>${flagImg}</td>
-                <td>${participant.group.getName()}</td>
+                <td>${contest.getGroupByNumber(participant.groupNumber).getName()}</td>
                 <td>${participant.car}</td>
                 <td><button id="showModalBtn" class = "altBtn" onclick='showDriverProfile("${participant.user.name}")'>Show</button></td>
             </tr>`
@@ -89,10 +90,10 @@ function bgRoll() {
 
 // Compare function for sorting participants by Group (descending order)
 function compareGroups(participant1, participant2) {
-    if (participant1.group.number < participant2.group.number) {
+    if (participant1.groupNumber < participant2.groupNumber) {
         return -1;
     }
-    if (participant1.group.number > participant2.group.number) {
+    if (participant1.groupNumber > participant2.groupNumber) {
         return 1;
     }
     return 0;
@@ -101,7 +102,7 @@ function compareGroups(participant1, participant2) {
 function showDriverProfile(participantName) {
     const participant = contest.getParticipantByName(participantName);
     document.getElementById("modalDriverProfile").style.display = "flex";
-    let driverProfileImgFilename = `${participant.group.name}_${participant.user.name}`;
+    let driverProfileImgFilename = `${contest.getGroupByNumber(participant.groupNumber).getName()}_${participant.user.name}`;
     document.getElementById("driverProfileImg").setAttribute("src", `../../resources/driver_profiles/MFMI${contest.name.substr(-2, 2)}/${driverProfileImgFilename.toLowerCase().replaceAll(' ','')}.png`);
 }
 
@@ -140,6 +141,7 @@ function loadRallyTables(RallyID){
 
     if(RallyID !== 6){
         for(let i = 0; i< stages.length; i++){
+            console.log(stages[i]);
             stages[i].CreateContestEntireStageTable(tables, 0) 
         }
         contest.rallies[RallyID].getSummary(nParticipants).CreateContestEntireStageTable(summaryDiv, 1)

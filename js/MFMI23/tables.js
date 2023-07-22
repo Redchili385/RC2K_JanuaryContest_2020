@@ -40,7 +40,7 @@ class Participant{
         this.user = user
         this.color = color
         this.car = car
-        this.group = null
+        this.groupNumber = null
         switch(car) {
             case "Mitsubishi Lancer Evo V":
                 this.wcbFactor = 1.05;
@@ -62,7 +62,7 @@ class Participant{
         }
     }
     setGroup(group) {
-        this.group = group;
+        this.groupNumber = group.number;
     }
 }
 
@@ -76,7 +76,7 @@ class Group{
         return `G${this.number}`
     }
     addParticipant(participant){
-        participant.group = this
+        participant.setGroup(this);
         this.participants.push(participant)
     }
     addParticipants(participants){
@@ -97,6 +97,9 @@ class Contest{
     AddRally(rally){
         rally.id = this.rallies.length;
         this.rallies.push(rally);
+    }
+    getGroupByNumber(groupNumber) {
+        return this.groups.find(group => group.number === groupNumber);
     }
     getParticipantIDByName(name){
         function checkName(participant){
@@ -170,6 +173,13 @@ class Rally{
         this.name = name
         this.stages = []
     }
+    fromData(rallyData) {
+        const rally = new Rally(rallyData.name, rallyData.id);
+        rally.stages = rallyData.stages.map(stage => {
+            return Stage.fromData(stage);
+        });
+        // rally.getSummary()
+    }
     getSummary(sortBy = "centiseconds"){
         if(typeof this.summary !== "undefined"){
             return this.summary
@@ -236,6 +246,21 @@ class Stage{
             arcade: [],
             simulation: []
         };
+    }
+    fromData(stageData) {
+        const stage = new Stage(stageData.name, stageData.id);
+        stage.records = stageData.records.map(record => {
+            return Record.fromData(record);
+        });
+        stage.imageUrl = stageData.imageUrl;
+        stage.wr.arcade = stageData.wr.arcade.map(wr => {
+            return WorldRecord.fromData(wr);
+        });
+        stage.wr.simulation = stageData.wr.simulation.map(wr => {
+            return WorldRecord.fromData(wr);
+        });
+        return stage;
+        // rally.getSummary()
     }
     AddRecord(participant, time, penalty, verified){
         let newRecord = Record.fromUserInput(participant,time,penalty,verified)
