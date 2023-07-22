@@ -61,6 +61,9 @@ class Participant{
                 this.wcbFactor = 1.00;
         }
     }
+    setGroup(group) {
+        this.group = group;
+    }
 }
 
 class Group{
@@ -119,6 +122,42 @@ class Contest{
         this.summaryRally.id = 6
         return this.summaryRally
     }
+    async getResultsFromFirebase() {
+        return new Promise((resolve, reject) => {
+            const promises = [];
+            this.rallies.forEach(rally => {
+                rally.stages.forEach(stage => {
+                    this.participants.forEach(participant => {
+                        const firebaseDocRef = firestore.collection(stage.name).doc(participant.user.name);
+                        const getResult = firebaseDocRef.get()
+                            .then((doc) => {
+                                if(doc.exists) {
+                                    const data = doc.data();
+                                    stage.AddRecord(participant, new Time(data.time_cs).formattedTime, new Time(data.time_cs).formattedTime, "No");
+                                }
+                                else {
+                                    // doc.data() will be undefined in this case
+                                    console.log("No such document!");
+                                }
+                        }).catch((error) => {
+                            console.log("Error getting document:", error);
+                        });
+                        promises.push(getResult);
+                    });
+                });
+            });
+            Promise.all(promises)
+                .then(() => {
+                    this.finish();
+                    resolve(this.rallies); // Only return the rallies, no need for other data
+                })
+                .catch(error => {
+                    alert("Something went wrong! Please try again.");
+                    console.log(error);
+                    reject(error);
+                });
+        });
+    };
     finish(){
         this.rallies.forEach(rally => rally.finish())
         this.getFinalSummary().finish()

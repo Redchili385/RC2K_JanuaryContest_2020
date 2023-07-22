@@ -1,8 +1,82 @@
-const contest = await contestData();
+const contest = contestData();
+var localStorageContestResults = localStorage.getItem("results");
+if(localStorageContestResults == null){
+      contest.getResultsFromFirebase()
+        .then(results => {
+                localStorage.setItem("results", JSON.stringify(results));
+                contest.rallies = results;
+                console.log("Retrieveing results from database...")
+        })
+        .catch(error => {
+            // Handle errors, if needed
+            console.error(error);
+        });
+}
+else {
+    contest.rallies = JSON.parse(localStorageContestResults);
+    console.log("Retrieveing results from local storage...")
+}
+main(contest);
 
-console.log("Reading script.js")
-console.log(contest)
-console.log(contest.participants)
+function main(contest) {
+    console.log("Reading script.js")
+    console.log(contest)
+    bgRoll();
+
+    document.getElementById("title").innerHTML = contest.name
+
+    // Entry list generator (START)
+    let generateEntries = document.getElementById("generateEntries");
+    contest.participants.sort(compareGroups);
+    
+    
+    for(let i=0; i<contest.participants.length; i++) {
+        let participant = contest.participants[i];
+        let flagImg = `<img src="../../resources/flags/${participant.user.country}.png" style="height: 20px; min-width: 32px; border: 1px solid #CCC;" onerror="this.src='../../resources/flags/unknown.png'" />`;
+        if (generateEntries) {
+            generateEntries.innerHTML += 
+            `<tr>
+                <td>${participant.num}</td>
+                <td>${participant.user.name}</td>
+                <td>${flagImg}</td>
+                <td>${participant.group.getName()}</td>
+                <td>${participant.car}</td>
+                <td><button id="showModalBtn" class = "altBtn" onclick='showDriverProfile("${participant.user.name}")'>Show</button></td>
+            </tr>`
+        }
+    }
+    // Entry list generator (END)
+    
+    let buttonSpace = document.getElementById("buttons");
+    
+    if(buttonSpace){
+        for(let i=0; i< contest.rallies.length; i++){
+            let button = document.createElement("button")
+            button.setAttribute("onclick","loadRallyTables("+ i +")");
+            button.innerHTML = contest.rallies[i].name;
+            buttonSpace.appendChild(button);
+        }
+        loadRallyTables(0)
+    }
+    else {
+        contest.getFinalSummary()
+        contest.AddRally(contest.summaryRally);
+        console.log("FinalSummary")
+        loadRallyTables(6);
+    }
+
+    const quickUpdates = document.getElementsByClassName('updateContent');
+    const quickUpdatesAmount = quickUpdates.length;
+    let quickUpdateContent;
+    for(let i = 0; i < quickUpdatesAmount; i++) {
+        quickUpdateContent = quickUpdates[i].firstElementChild;
+        if(quickUpdateContent.innerHTML.trim().length == 0) {
+            quickUpdateContent.innerHTML = "The day hasn't finished yet. Please Check back later!";
+            quickUpdateContent.style.color = "gray";
+            quickUpdateContent.style.textAlign = "center";
+        }
+    }
+}
 
 // Roll a random background pic
 function bgRoll() {
@@ -12,9 +86,6 @@ function bgRoll() {
         'background-image' : 'url('+ bgm[Math.floor(Math.random() * bgm.length)] + ')',
     });
 }
-bgRoll();
-
-document.getElementById("title").innerHTML = contest.name
 
 // Compare function for sorting participants by Group (descending order)
 function compareGroups(participant1, participant2) {
@@ -38,46 +109,6 @@ function closeModal(event) {
     if(event.target != document.getElementById("driverProfileImg")) {   // If clicked anything but the image (so either the "X" or just outside the modal)
         document.getElementById("modalDriverProfile").style.display = "none";
     }
-}
-
-// Entry list generator (START)
-let generateEntries = document.getElementById("generateEntries");
-contest.participants.sort(compareGroups);
-
-
-for(let i=0; i<contest.participants.length; i++) {
-    let participant = contest.participants[i];
-    let flagImg = `<img src="../../resources/flags/${participant.user.country}.png" style="height: 20px; min-width: 32px; border: 1px solid #CCC;" onerror="this.src='../../resources/flags/unknown.png'" />`;
-    if (generateEntries) {
-        generateEntries.innerHTML += 
-        `<tr>
-            <td>${participant.num}</td>
-            <td>${participant.user.name}</td>
-            <td>${flagImg}</td>
-            <td>${participant.group.getName()}</td>
-            <td>${participant.car}</td>
-            <td><button id="showModalBtn" class = "altBtn" onClick='showDriverProfile("${participant.user.name}")'>Show</button></td>
-        </tr>`
-    }
-}
-// Entry list generator (END)
-
-let buttonSpace = document.getElementById("buttons");
-
-if(buttonSpace){
-    for(let i=0; i< contest.rallies.length; i++){
-        let button = document.createElement("button")
-        button.setAttribute("onclick","loadRallyTables("+ i +")");
-        button.innerHTML = contest.rallies[i].name;
-        buttonSpace.appendChild(button);
-    }
-    loadRallyTables(0)
-}
-else{
-    contest.getFinalSummary()
-    contest.AddRally(contest.summaryRally);
-    console.log("FinalSummary")
-    loadRallyTables(6);
 }
 
 function clone(obj) {
@@ -250,16 +281,4 @@ function loadRallyTables(RallyID){
     else{
         chart_record = new Chart(ctx_record, Data_record);
     } 
-}
-
-const quickUpdates = document.getElementsByClassName('updateContent');
-const quickUpdatesAmount = quickUpdates.length;
-let quickUpdateContent;
-for(let i = 0; i < quickUpdatesAmount; i++) {
-    quickUpdateContent = quickUpdates[i].firstElementChild;
-    if(quickUpdateContent.innerHTML.trim().length == 0) {
-        quickUpdateContent.innerHTML = "The day hasn't finished yet. Please Check back later!";
-        quickUpdateContent.style.color = "gray";
-        quickUpdateContent.style.textAlign = "center";
-    }
 }

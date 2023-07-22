@@ -61,7 +61,7 @@ function formSetup() {
             stages: ["Hamilton's Folly", "Tyrones Ditches"]
         },
         {
-            date: new Date("2023-07-21"),
+            date: new Date("2023-07-22"),
             stages: ["Feeney", "Parkanaur"]
         },
         {
@@ -146,6 +146,7 @@ function generateFormContent(form, currentLeg) {
     currentLeg.stages.forEach(stage => {
         const fieldset_stage = document.createElement("fieldset");
         const legend_stage = document.createElement("legend");
+        const field_dnf = generateFormField("DNF", "dnf_" + stage, "dnf", "checkbox", "");
         const field_time = document.createElement("div");
         const field_time_min = generateFormField("Time", "timeMin_" + stage, "timeMin", "number", "MM");
         const span_timeSeparator_minSec = document.createElement("span");
@@ -191,6 +192,7 @@ function generateFormContent(form, currentLeg) {
         field_time.appendChild(span_timeSeparator_secCS);
         field_time.appendChild(field_time_cs);
         fieldset_stage.appendChild(legend_stage);
+        fieldset_stage.appendChild(field_dnf);
         fieldset_stage.appendChild(field_time);
         fieldset_stage.appendChild(field_replayFile);
         fieldset_stage.appendChild(field_twitchLink);
@@ -290,9 +292,7 @@ function generateFormContent(form, currentLeg) {
                     files.forEach(file => {
                         // If file was uploaded by the user, put it in the Firebase Storage
                         if(file.data) {
-                            console.log(file.for);
                             const fileName = stage + "/" + participant_name + "/" + file.for + "/" + file.data.name;
-                            console.log(fileName);
                             const metadata = {
                                 contentType: file.data.type
                             };

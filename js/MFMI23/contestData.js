@@ -1,4 +1,4 @@
-async function contestData(){
+function contestData(){
     if(typeof(website) === "undefined"){
         website = websiteData()
         console.log(website);
@@ -11,7 +11,7 @@ async function contestData(){
     let G4 = new Group(4);
     contest.groups.push(G1, G2, G3, G4)
 
-    const participantColors = generateDistinctColors(15)
+    const participantColors = generateDistinctColors(19)
     let colorIndex = 0
     const participantColor = () => participantColors[colorIndex++];
 
@@ -40,6 +40,11 @@ async function contestData(){
     G2.addParticipants([Pendzior, TheKetrab, Migger, Erwto, Linotrix, Twajlot])
     G3.addParticipants([XsaraTorrada, KarelPipa, Red_T, XsaraTorrada])
     G4.addParticipants([Woeringen1288, BrosTheThird, datsun100aGTR, Certare, Lewsys, sBinnala])
+
+    G1.participants.forEach(participant => participant.setGroup(G1));
+    G2.participants.forEach(participant => participant.setGroup(G2));
+    G3.participants.forEach(participant => participant.setGroup(G3));
+    G4.participants.forEach(participant => participant.setGroup(G4));
 
     contest.rallies = website.game.rallies;
     // let rally, stage
@@ -1335,40 +1340,6 @@ async function contestData(){
     // //     wr.proofs.add("replay", "https://drive.google.com/file/d/1nB0l9Rb5XabC6OKjWAWOil8NVWnxPTS7/view?usp=sharing")
     // }
 
-
-    const getResultsFromFirebase = await new Promise((resolve, reject) => {
-        const promises = [];
-        contest.rallies.forEach(rally => {
-            rally.stages.forEach(stage => {
-                contest.participants.forEach(participant => {
-                    const firebaseDocRef = firestore.collection(stage.name).doc(participant.user.name);
-                    const getResult = firebaseDocRef.get()
-                        .then((doc) => {
-                            if(doc.exists) {
-                                const data = doc.data();
-                                wr = stage.AddRecord(participant, new Time(data.time_cs).formattedTime, new Time(data.time_cs).formattedTime, "No");
-                            }
-                            else {
-                                // doc.data() will be undefined in this case
-                                console.log("No such document!");
-                            }
-                    }).catch((error) => {
-                        console.log("Error getting document:", error);
-                    });
-                    promises.push(getResult);
-                });
-            });
-        });
-        Promise.all(promises)
-            .then(() => {
-                contest.finish();
-                resolve(contest);
-            })
-            .catch(error => {
-                alert("Something went wrong! Please try again.");
-                console.log(error);
-                reject(error);
-            });
-    });
-    return getResultsFromFirebase;
+    contest.finish();
+    return contest;
 }
