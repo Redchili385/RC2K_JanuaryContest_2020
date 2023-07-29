@@ -16,7 +16,7 @@ function contestData(){
     const participantColor = () => participantColors[colorIndex++];
 
     let Erwto =         new Participant(20, website.GetUserByName('Erwto'),             participantColor(), 'Mitsubishi Lancer Evo IV');
-    let Migger =        new Participant(23, website.GetUserByName('Migger'),            participantColor(), 'Mitsubishi Lancer Evo IV');
+    let Migger =        new Participant(23, website.GetUserByName('Migger'),            participantColor(), 'Proton Wira/Persona');
     let SpartaRemixer = new Participant(2,  website.GetUserByName('SpartaRemixer'),     participantColor(), 'Subaru Impreza WRC');
     let Ephemeral =     new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Mitsubishi Lancer Evo IV');
     let XsaraTorrada =  new Participant(69, website.GetUserByName('XsaraTorrada'),      participantColor(), 'Peugeot 206 WRC');
