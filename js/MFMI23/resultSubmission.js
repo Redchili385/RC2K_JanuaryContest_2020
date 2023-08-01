@@ -1,4 +1,4 @@
-const contest = contestData();
+contest = contestData();
 formSetup();
 
 function formSetup() {
@@ -41,7 +41,7 @@ function formSetup() {
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
-            date: new Date("2023-08-16"),
+            date: new Date("2023-08-01"),
             stages: ["Black Loch", "Glentrool"]
         },
         {
@@ -263,7 +263,7 @@ function generateFormContent(form, currentLeg) {
                     // Text data goes to document collection
                     const db = firestore.collection(stage);
                     const textDataTransferTask = db.doc(participant_name).set({
-                        time_cs: time_cs,
+                        time_cs: parseInt(time_cs),
                         twitch_link: twitch_link,
                         yt_link: yt_link
                     }).then(() => {
