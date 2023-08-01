@@ -1,4 +1,4 @@
-const contest = await contestData();
+const contest = contestData();
 
 currentWrDirection = "arcade";
 currentRallyId = 0;

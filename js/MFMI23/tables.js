@@ -32,6 +32,9 @@ class User{
         this.name = name;
         this.country = country;
     }
+    static fromData(userData) {
+        return new User(userData.name, userData.country);
+    }
 }
 
 class Participant{
@@ -60,6 +63,11 @@ class Participant{
             default:
                 this.wcbFactor = 1.00;
         }
+    }
+    static fromData(participantData) {
+        const participant = new Participant(participantData.num, User.fromData(participantData.user), participantData.color, participantData.car)
+        participant.groupNumber = participantData.groupNumber
+        return participant
     }
     setGroup(group) {
         this.groupNumber = group.number;
@@ -93,6 +101,14 @@ class Contest{
         this.participants = []
         this.rallies = []
         this.groups = []
+    }
+    updateRecords(records) {
+        this.rallies = [];
+        records.forEach(rally => {
+            if(rally !== records[records.length - 1]) { // Last one is the final summary
+                this.AddRally(Rally.fromData(rally));
+            }
+        })
     }
     AddRally(rally){
         rally.id = this.rallies.length;
@@ -173,12 +189,13 @@ class Rally{
         this.name = name
         this.stages = []
     }
-    fromData(rallyData) {
+    static fromData(rallyData) {
         const rally = new Rally(rallyData.name, rallyData.id);
         rally.stages = rallyData.stages.map(stage => {
             return Stage.fromData(stage);
         });
-        // rally.getSummary()
+        rally.finish()
+        return rally;
     }
     getSummary(sortBy = "centiseconds"){
         if(typeof this.summary !== "undefined"){
@@ -247,7 +264,7 @@ class Stage{
             simulation: []
         };
     }
-    fromData(stageData) {
+    static fromData(stageData) {
         const stage = new Stage(stageData.name, stageData.id);
         stage.records = stageData.records.map(record => {
             return Record.fromData(record);
@@ -259,6 +276,7 @@ class Stage{
         stage.wr.simulation = stageData.wr.simulation.map(wr => {
             return WorldRecord.fromData(wr);
         });
+        stage.finish();
         return stage;
         // rally.getSummary()
     }
@@ -389,7 +407,7 @@ class Stage{
                 td = tr.insertCell();
                 td.innerHTML = flagImg;
                 td = tr.insertCell();
-                td.appendChild(document.createTextNode(record.participant.group.name));
+                td.appendChild(document.createTextNode(contest.getGroupByNumber(record.participant.groupNumber).name));
                 td = tr.insertCell();
                 td.appendChild(document.createTextNode(finalTimeToDisplay));
                 tr.innerHTML += finalTimeRow_wcbAdjusted;
@@ -462,6 +480,11 @@ class Record{
         this.gapToLeader = 0;
         this.verified = verified;
         this.proofs = new ProofsWrapper();
+    }
+    static fromData(recordData) {
+        const record = new Record(Participant.fromData(recordData.participant), Time.fromData(recordData.initialTime), Time.fromData(recordData.penalty), RecordStatus.fromData(recordData.status), recordData.verified);
+        return record;
+        // rally.getSummary()
     }
     static fromUserInput(participant, timeString, penaltyString, verified){
         let initialTime = new Time(0)
@@ -622,6 +645,11 @@ class WorldRecord extends Record{
         super(participant, time, new Time(0), new RecordStatus("FINISHED"), true)
         this.direction = direction
     }
+    static fromData(worldRecordData) {
+        const worldRecord = new WorldRecord(User.fromData(worldRecordData.participant.user), Time.fromData(worldRecordData.finalTime), worldRecordData.direction, worldRecordData.participant.car);
+        return worldRecord;
+        // rally.getSummary()
+    }
     static fromUserInput(user, time, direction, carName){
         return new WorldRecord(user, Time.fromFormattedTime(time), direction, carName)
     }
@@ -637,6 +665,9 @@ class RecordStatus{
             default: this.value = "DNF"
         }
         this.didFinish = this.value === "FINISHED" 
+    }
+    static fromData(recordStatusData) {
+        return new RecordStatus(recordStatusData.value);
     }
     getNextStageStatus(){
         switch(this.value){
@@ -719,6 +750,9 @@ class Time{
         this.centiseconds = centiseconds;
         this.formattedTime = Time.centisecondsToTime(centiseconds)
         this.signedFormattedTime = this.centiseconds >= 0 ? `+${this.formattedTime}` : this.formattedTime
+    }
+    static fromData(timeData) {
+        return new Time(timeData.centiseconds)
     }
     static fromFormattedTime(formattedTime){
         if(!this.isValidTimeString(formattedTime))

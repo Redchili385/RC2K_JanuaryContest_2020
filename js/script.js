@@ -1,21 +1,23 @@
-const contest = contestData();
-var localStorageContestResults = localStorage.getItem("results");
-if(localStorageContestResults == null){
-      contest.getResultsFromFirebase()
-        .then(results => {
-            console.log(results)
-                localStorage.setItem("results", JSON.stringify(results));
-                contest.rallies = results;
+let contest = contestData();
+if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
+    var localStorageContestResults = localStorage.getItem("results");
+    if(localStorageContestResults == null){
+          contest.getResultsFromFirebase()
+            .then(results => {
                 console.log("Retrieveing results from database...")
-        })
-        .catch(error => {
-            // Handle errors, if needed
-            console.error(error);
-        });
-}
-else {
-    contest.rallies = JSON.parse(localStorageContestResults);
-    console.log("Retrieveing results from local storage...")
+                console.log(results)
+                localStorage.setItem("results", JSON.stringify(results));
+                contest.updateRecords(results);
+            })
+            .catch(error => {
+                // Handle errors, if needed
+                console.error(error);
+            });
+    }
+    else {
+        console.log("Retrieveing results from local storage...")
+        contest.updateRecords(JSON.parse(localStorageContestResults));
+    }
 }
 main(contest);
 
@@ -51,6 +53,7 @@ function main(contest) {
     let buttonSpace = document.getElementById("buttons");
     
     if(buttonSpace){
+        console.log(contest.rallies)
         for(let i=0; i< contest.rallies.length; i++){
             let button = document.createElement("button")
             button.setAttribute("onclick","loadRallyTables("+ i +")");
@@ -141,7 +144,6 @@ function loadRallyTables(RallyID){
 
     if(RallyID !== 6){
         for(let i = 0; i< stages.length; i++){
-            console.log(stages[i]);
             stages[i].CreateContestEntireStageTable(tables, 0) 
         }
         contest.rallies[RallyID].getSummary(nParticipants).CreateContestEntireStageTable(summaryDiv, 1)
@@ -268,6 +270,7 @@ function loadRallyTables(RallyID){
             }
         }
     }
+    let chart, chart_record
     if(typeof(chart) !== "undefined"){
         chart.data = data
         chart.update();

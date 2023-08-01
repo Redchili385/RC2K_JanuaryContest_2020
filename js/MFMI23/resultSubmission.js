@@ -1,4 +1,4 @@
-const contest = await contestData();
+const contest = contestData();
 formSetup();
 
 function formSetup() {
@@ -61,7 +61,7 @@ function formSetup() {
             stages: ["Hamilton's Folly", "Tyrones Ditches"]
         },
         {
-            date: new Date("2023-07-22"),
+            date: new Date("2023-08-21"),
             stages: ["Feeney", "Parkanaur"]
         },
         {
