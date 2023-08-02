@@ -390,15 +390,20 @@ function validateResultSubmissionForm() {
     const ytLinks = form.getElementsByClassName("input_ytLink");
     let validationSuccessful = true;
     for(let stageNo = 0; stageNo < replayFiles.length; stageNo++) {
-        if(replayFiles[stageNo].files.length === 0 && twitchLinks[stageNo].value.length === 0 && ytLinks[stageNo].value.length === 0) {
-            replayFiles[stageNo].parentNode.querySelector(".uploadBtn_replayFile").style.borderColor = "red";
-            twitchLinks[stageNo].style.borderColor = "red";
-            ytLinks[stageNo].style.borderColor = "red";
-            validationSuccessful = false;
+        validationSuccessful = replayFiles[stageNo].files.length !== 0 || twitchLinks[stageNo].value.length !== 0 || ytLinks[stageNo].value.length !== 0;
+        toggleAllValidationHighlight(
+            [replayFiles[stageNo].parentNode.querySelector(".uploadBtn_replayFile"), twitchLinks[stageNo], ytLinks[stageNo]],
+            validationSuccessful
+        )
+        if(!validationSuccessful) {
             alert(stages[stageNo].textContent + " has no proof material attached. Please provide one of the following: a replay file, a Twitch link or a YouTube link");
         }
     }
     return validationSuccessful;
+}
+
+function toggleAllValidationHighlight(inputArray, isValid) {
+    inputArray.forEach(input => input.style.borderColor = isValid ? "initial" : "red");
 }
 
 function resetValidationHighlight(event) {
