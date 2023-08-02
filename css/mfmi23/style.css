@@ -658,3 +658,11 @@ input[type="file"] {
 #successMsg, #loadingIcon {
     display: none;
 }
+
+.formField .input_dnf {
+    width: fit-content;
+}
+
+input:disabled {
+    background-color: #EEE;
+}

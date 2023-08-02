@@ -41,7 +41,7 @@ function formSetup() {
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
-            date: new Date("2023-08-01"),
+            date: new Date("2023-08-02"),
             stages: ["Black Loch", "Glentrool"]
         },
         {
@@ -158,22 +158,24 @@ function generateFormContent(form, currentLeg) {
         const field_youtubeLink = generateFormField("Youtube Link", "ytLink_" + stage, "ytLink", "text", "https://youtu.be/dQw4w9WgXcQ");
         const field_timeImage = generateFormField("Time Image(s)", "timeImage_" + stage, "timeImage", "file", "");
         const field_serviceAreaImage = generateFormField("Service Area Image", "serviceAreaImage_" + stage, "serviceAreaImage", "file", "");
+        const input_dnf = field_dnf.getElementsByTagName("input")[0];
         const input_time_min = field_time_min.getElementsByTagName("input")[0];
         const input_time_sec = field_time_sec.getElementsByTagName("input")[0];
         const input_time_cs = field_time_cs.getElementsByTagName("input")[0];
         const input_timeImage = field_timeImage.getElementsByTagName("input")[0];
         const input_serviceAreaImage = field_serviceAreaImage.getElementsByTagName("input")[0];
 
-        setAttributes(fieldset_stage, {"id": "fieldset_" + stage, "class": "fieldset_stage"});
-        setAttributes(legend_stage, {"id": "legend_" + stage, "class": "legend_stage"});
-        setAttributes(field_time, {"id": "time_" + stage, "class": "time"});
-        setAttributes(input_time_min, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
-        setAttributes(span_timeSeparator_minSec, {"id": "span_timeSeparator_minSec_" + stage, "class": "span_timeSeparator span_timeSeparator_minSec"});
-        setAttributes(input_time_sec, {"min": "0", "max": "59", "oninput": "addLeadingZero(this)", "required": "true"});
-        setAttributes(span_timeSeparator_secCS, {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
-        setAttributes(input_time_cs, {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
-        setAttributes(input_timeImage, {"accept": "image/*", "multiple": "true"});
-        setAttributes(input_serviceAreaImage, {"accept": "image/*"});
+        setAttributes(fieldset_stage,               {"id": "fieldset_" + stage, "class": "fieldset_stage"});
+        setAttributes(legend_stage,                 {"id": "legend_" + stage, "class": "legend_stage"});
+        setAttributes(input_dnf,                    {"onchange": "toggleDNFCheckbox(this)"});
+        setAttributes(field_time,                   {"id": "time_" + stage, "class": "time"});
+        setAttributes(input_time_min,               {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(span_timeSeparator_minSec,    {"id": "span_timeSeparator_minSec_" + stage, "class": "span_timeSeparator span_timeSeparator_minSec"});
+        setAttributes(input_time_sec,               {"min": "0", "max": "59", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(span_timeSeparator_secCS,     {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
+        setAttributes(input_time_cs,                {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(input_timeImage,              {"accept": "image/*", "multiple": "true"});
+        setAttributes(input_serviceAreaImage,       {"accept": "image/*"});
 
         field_time_min.classList.add("field_time");
         field_time_sec.classList.add("field_time");
@@ -358,6 +360,10 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
     field.appendChild(input);
 
     return field;
+}
+
+function toggleDNFCheckbox(checkbox) {
+    Array.from(checkbox.parentNode.parentNode.querySelectorAll(".input_time")).forEach(input_time => checkbox.checked ? input_time.setAttribute("disabled", "") : input_time.removeAttribute("disabled"));
 }
 
 function displayInputFileName(event) {
