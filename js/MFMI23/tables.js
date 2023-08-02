@@ -105,10 +105,8 @@ class Contest{
     updateRecords(records) {
         this.rallies = [];
         records.forEach(rally => {
-            if(rally !== records[records.length - 1]) { // Last one is the final summary
-                this.AddRally(Rally.fromData(rally));
-            }
-        })
+            this.AddRally(Rally.fromData(rally));
+        });
     }
     AddRally(rally){
         rally.id = this.rallies.length;
