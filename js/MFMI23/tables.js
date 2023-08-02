@@ -150,7 +150,18 @@ class Contest{
                             .then((doc) => {
                                 if(doc.exists) {
                                     const data = doc.data();
-                                    stage.AddRecord(participant, new Time(data.time_cs).formattedTime, new Time(data.time_cs).formattedTime, "No");
+                                    let time, penalty;
+                                    if(data.dnf) {
+                                        time = "DNF";
+                                    }
+                                    else if(data.dsq) {
+                                        time = "DSQ";
+                                    }
+                                    else {
+                                        time = new Time(data.time_cs).formattedTime;
+                                    }
+                                    penalty = data.penalty_cs;
+                                    stage.AddRecord(participant, time, penalty, "No");
                                 }
                                 else {
                                     // doc.data() will be undefined in this case

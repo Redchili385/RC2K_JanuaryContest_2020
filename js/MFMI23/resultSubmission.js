@@ -41,11 +41,11 @@ function formSetup() {
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
-            date: new Date("2023-08-02"),
+            date: new Date("2023-08-06"),
             stages: ["Black Loch", "Glentrool"]
         },
         {
-            date: new Date("2023-08-19"),
+            date: new Date("2023-08-17"),
             stages: ["Ae"]
         },
         {
@@ -255,17 +255,21 @@ function generateFormContent(form, currentLeg) {
                 const promises = [];
                 Array.from(stageFieldsets).forEach(fieldset => {
                     const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
+                    const didNotFinish = fieldset.getElementsByClassName("input_dnf")[0].checked;
                     const time_cs
-                        = fieldset.getElementsByClassName("input_timeMin")[0].value * 6000
-                        + fieldset.getElementsByClassName("input_timeSec")[0].value * 100
-                        + fieldset.getElementsByClassName("input_timeCS")[0].value;
+                        = parseInt(fieldset.getElementsByClassName("input_timeMin")[0].value) * 6000
+                        + parseInt(fieldset.getElementsByClassName("input_timeSec")[0].value) * 100
+                        + parseInt(fieldset.getElementsByClassName("input_timeCS")[0].value);
                     const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
                     const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
 
                     // Text data goes to document collection
                     const db = firestore.collection(stage);
                     const textDataTransferTask = db.doc(participant_name).set({
-                        time_cs: parseInt(time_cs),
+                        dnf: didNotFinish,
+                        dsq: false,
+                        time_cs: time_cs,
+                        penalty_cs: 0,
                         twitch_link: twitch_link,
                         yt_link: yt_link
                     }).then(() => {
@@ -363,7 +367,15 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
 }
 
 function toggleDNFCheckbox(checkbox) {
-    Array.from(checkbox.parentNode.parentNode.querySelectorAll(".input_time")).forEach(input_time => checkbox.checked ? input_time.setAttribute("disabled", "") : input_time.removeAttribute("disabled"));
+    Array.from(checkbox.parentNode.parentNode.querySelectorAll(".input_time")).forEach(input_time => {
+        if(checkbox.checked) {
+            input_time.setAttribute("disabled", "");
+            input_time.value = "";
+        }
+        else {
+            input_time.removeAttribute("disabled");
+        }
+    });
 }
 
 function displayInputFileName(event) {
@@ -385,18 +397,50 @@ function displayInputFileName(event) {
 function validateResultSubmissionForm() {
     const form = document.forms["resultSubmissionForm"];
     const stages = form.getElementsByClassName("legend_stage");
+    const dnf = form.getElementsByClassName("input_dnf");
     const replayFiles = form.getElementsByClassName("input_replayFile");
     const twitchLinks = form.getElementsByClassName("input_twitchLink");
     const ytLinks = form.getElementsByClassName("input_ytLink");
+    const timeMin = form.getElementsByClassName("input_timeMin")
+    const timeSec = form.getElementsByClassName("input_timeSec")
+    const timeCS = form.getElementsByClassName("input_timeCS")
     let validationSuccessful = true;
-    for(let stageNo = 0; stageNo < replayFiles.length; stageNo++) {
-        validationSuccessful = replayFiles[stageNo].files.length !== 0 || twitchLinks[stageNo].value.length !== 0 || ytLinks[stageNo].value.length !== 0;
+    for(let stageNo = 0; stageNo < stages.length; stageNo++) {
+        const missingRunRecord = replayFiles[stageNo].files.length === 0 && twitchLinks[stageNo].value.length === 0 && ytLinks[stageNo].value.length === 0;
+        const missingTimeMin = timeMin[stageNo].value.length === 0 && !dnf[stageNo].checked;
+        const missingTimeSec = timeSec[stageNo].value.length === 0 && !dnf[stageNo].checked;
+        const missingTimeCS = timeCS[stageNo].value.length === 0 && !dnf[stageNo].checked;
+
         toggleAllValidationHighlight(
             [replayFiles[stageNo].parentNode.querySelector(".uploadBtn_replayFile"), twitchLinks[stageNo], ytLinks[stageNo]],
-            validationSuccessful
+            !missingRunRecord
         )
-        if(!validationSuccessful) {
+        toggleAllValidationHighlight(
+            [timeMin[stageNo]],
+            !missingTimeMin
+        )
+        toggleAllValidationHighlight(
+            [timeSec[stageNo]],
+            !missingTimeSec
+        )
+        toggleAllValidationHighlight(
+            [timeCS[stageNo]],
+            !missingTimeCS
+        )
+        if(missingRunRecord) {
             alert(stages[stageNo].textContent + " has no proof material attached. Please provide one of the following: a replay file, a Twitch link or a YouTube link");
+        }
+        if(missingTimeMin) {
+            alert(stages[stageNo].textContent + " has no time (CS) entered. Please enter the correct value (even it it is zero)");
+        }
+        if(missingTimeSec) {
+            alert(stages[stageNo].textContent + " has no time (SS) entered. Please enter the correct value (even it it is zero)");
+        }
+        if(missingTimeCS) {
+            alert(stages[stageNo].textContent + " has no time (MM) entered. Please enter the correct value (even it it is zero)");
+        }
+        if(missingRunRecord || missingTimeMin || missingTimeSec || missingTimeCS) {
+            validationSuccessful = false;
         }
     }
     return validationSuccessful;
