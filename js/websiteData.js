@@ -300,7 +300,7 @@ function websiteData(){
         wr.proofs.add("youtube", "https://www.youtube.com/watch?v=lNq-FZ3Mwgs")
         rally.stages[2] = stage;
 
-        stage = new Stage("Black loch");
+        stage = new Stage("Black Loch");
         wr = stage.AddArcadeWorldRecord(Spartax, "05:10.41")
         wr.proofs.add("youtube", "https://youtu.be/TqrXsNgk2fw")
         wr.proofs.add("replay", "https://drive.google.com/file/d/1LWRumQTu118fKkAqVcQc6Ayqf7k53B4C/view?usp=sharing")

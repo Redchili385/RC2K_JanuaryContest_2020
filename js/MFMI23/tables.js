@@ -786,7 +786,7 @@ class Time{
             time = time.slice(1)
         }
         let index = time.lastIndexOf('.')
-        centiseconds += parseInt(time.slice(index+1,index+3))
+        centiseconds += parseInt(time.slice(index+1,index+3))   // centiseconds
         time = time.slice(0,index)
         index = time.lastIndexOf(':')
         centiseconds += 100 * parseInt(time.slice(index+1, time.length))   //seconds
@@ -795,7 +795,8 @@ class Time{
         centiseconds += 60 * 100 * parseInt(time.slice(index+1, time.length)) //minutes
         if(index === -1) return centiseconds;
         time = time.slice(0, index)
-        centiseconds += 60 * 60 * 100 * parseInt(time.slice) //hours
+        centiseconds += 60 * 60 * 100 * parseInt(time) //hours
+        console.log(centiseconds)
         if(isNegative){
             centiseconds = -centiseconds
         }
