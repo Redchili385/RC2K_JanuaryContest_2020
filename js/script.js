@@ -4,10 +4,11 @@ if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
     if(localStorageContestResults == null){
           contest.getResultsFromFirebase()
             .then(results => {
-                console.log("Retrieveing results from database...")
-                console.log(results)
-                localStorage.setItem("results", JSON.stringify(results));
-                contest.updateRecords(results);
+                setTimeout(() => {
+                    console.log("Retrieveing results from database...")
+                    localStorage.setItem("results", JSON.stringify(results));
+                    contest.updateRecords(results);
+                }, 1000)
             })
             .catch(error => {
                 // Handle errors, if needed
@@ -53,7 +54,6 @@ function main(contest) {
     let buttonSpace = document.getElementById("buttons");
     
     if(buttonSpace){
-        console.log(contest.rallies)
         for(let i=0; i< contest.rallies.length; i++){
             let button = document.createElement("button")
             button.setAttribute("onclick","loadRallyTables("+ i +")");

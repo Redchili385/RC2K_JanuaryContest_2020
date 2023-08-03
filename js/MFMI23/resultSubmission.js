@@ -5,7 +5,7 @@ function formSetup() {
     // Should probably move this to contestData...
     const schedule = [
         {
-            date: new Date("2023-08-07"),
+            date: new Date("2023-08-03"),
             stages: ["Clocaenog Mid", "Penmachno South"]
         },
         {

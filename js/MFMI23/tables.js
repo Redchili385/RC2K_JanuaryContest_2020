@@ -162,45 +162,52 @@ class Contest{
                                     }
                                     penalty = data.penalty_cs;
                                     const record = stage.AddRecord(participant, time, penalty, "No");
-
-                                    // Get proofs
+                                    if(data.yt_link) {
+                                        record.proofs.add("youtube", data.yt_link);
+                                    }
+                                    if(data.twitch_link) {
+                                        record.proofs.add("twitch", data.twitch_link);
+                                    }
+                                    // Get file proofs from storage
                                     const basePathReference = stage.name + "/" + participant.user.name;
                                     const replayPathReference = firebaseStorage.ref(basePathReference + "/replay");
                                     const serviceAreaPathReference = firebaseStorage.ref(basePathReference + "/serviceArea");
                                     const timePathReference = firebaseStorage.ref(basePathReference + "/time");
                                     [replayPathReference, serviceAreaPathReference, timePathReference].forEach(storageRef => {
-                                        storageRef.listAll().then(fileList => {
-                                            fileList.items.forEach(fileRef => {
-                                                fileRef.getDownloadURL()
-                                                    .then((url) => {
-                                                        console.log(url)
-                                                        // record.proofs.add();
-                                                    })
-                                                    .catch((error) => {
-                                                    // A full list of error codes is available at
-                                                    // https://firebase.google.com/docs/storage/web/handle-errors
-                                                    switch (error.code) {
-                                                        case 'storage/object-not-found':
-                                                        // File doesn't exist
-                                                        break;
-                                                        case 'storage/unauthorized':
-                                                        // User doesn't have permission to access the object
-                                                        break;
-                                                        case 'storage/canceled':
-                                                        // User canceled the upload
-                                                        break;
-        
-                                                        // ...
-        
-                                                        case 'storage/unknown':
-                                                        // Unknown error occurred, inspect the server response
-                                                        break;
-                                                    }
+                                        const listFiles = storageRef.listAll()
+                                            .then(fileList => {
+                                                fileList.items.forEach(fileRef => {
+                                                    const obtainFile = fileRef.getDownloadURL()
+                                                        .then((url) => {
+                                                            record.proofs.add(storageRef === replayPathReference ? "replay" : "image", url);
+                                                        })
+                                                        .catch((error) => {
+                                                        // A full list of error codes is available at
+                                                        // https://firebase.google.com/docs/storage/web/handle-errors
+                                                            switch (error.code) {
+                                                                case 'storage/object-not-found':
+                                                                // File doesn't exist
+                                                                break;
+                                                                case 'storage/unauthorized':
+                                                                // User doesn't have permission to access the object
+                                                                break;
+                                                                case 'storage/canceled':
+                                                                // User canceled the upload
+                                                                break;
+                
+                                                                // ...
+                
+                                                                case 'storage/unknown':
+                                                                // Unknown error occurred, inspect the server response
+                                                                break;
+                                                            }
+                                                        });
+                                                    promises.push(obtainFile);
+                                                });
+                                            }).catch((error) => {
+                                                console.log(error);
                                             });
-                                        });
-                                        }).catch(function(error) {
-                                            console.log(error);
-                                        });
+                                        promises.push(listFiles);
                                     });
                                 }
                                 else {
@@ -532,8 +539,10 @@ class Record{
     }
     static fromData(recordData) {
         const record = new Record(Participant.fromData(recordData.participant), Time.fromData(recordData.initialTime), Time.fromData(recordData.penalty), RecordStatus.fromData(recordData.status), recordData.verified);
+        recordData.proofs.values.forEach(proof => {
+            record.proofs.add(proof.type, proof.link)
+        });
         return record;
-        // rally.getSummary()
     }
     static fromUserInput(participant, timeString, penaltyString, verified){
         let initialTime = new Time(0)
@@ -845,7 +854,6 @@ class Time{
         if(index === -1) return centiseconds;
         time = time.slice(0, index)
         centiseconds += 60 * 60 * 100 * parseInt(time) //hours
-        console.log(centiseconds)
         if(isNegative){
             centiseconds = -centiseconds
         }
