@@ -162,6 +162,8 @@ function generateFormContent(form, currentLeg) {
         const input_time_min = field_time_min.getElementsByTagName("input")[0];
         const input_time_sec = field_time_sec.getElementsByTagName("input")[0];
         const input_time_cs = field_time_cs.getElementsByTagName("input")[0];
+        const input_twitchLink = field_twitchLink.getElementsByTagName("input")[0];
+        const input_youtubeLink = field_youtubeLink.getElementsByTagName("input")[0];
         const input_timeImage = field_timeImage.getElementsByTagName("input")[0];
         const input_serviceAreaImage = field_serviceAreaImage.getElementsByTagName("input")[0];
 
@@ -174,6 +176,8 @@ function generateFormContent(form, currentLeg) {
         setAttributes(input_time_sec,               {"min": "0", "max": "59", "oninput": "addLeadingZero(this)", "required": "true"});
         setAttributes(span_timeSeparator_secCS,     {"id": "span_timeSeparator_secCS_" + stage, "class": "span_timeSeparator span_timeSeparator_secCS"});
         setAttributes(input_time_cs,                {"min": "0", "max": "99", "oninput": "addLeadingZero(this)", "required": "true"});
+        setAttributes(input_twitchLink,             {"pattern": /^((?:https?:)?\/\/)?((?:www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\.)?twitch\.tv\/(?!directory|p|user\/legal|admin|login|signup|jobs)(\w+)$/.toString().slice(2, -2)});
+        setAttributes(input_youtubeLink,            {"pattern": /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/.toString().slice(2, -2)});
         setAttributes(input_timeImage,              {"accept": "image/*", "multiple": "true"});
         setAttributes(input_serviceAreaImage,       {"accept": "image/*"});
 
@@ -406,38 +410,68 @@ function validateResultSubmissionForm() {
     const timeCS = form.getElementsByClassName("input_timeCS")
     let validationSuccessful = true;
     for(let stageNo = 0; stageNo < stages.length; stageNo++) {
-        const missingRunRecord = replayFiles[stageNo].files.length === 0 && twitchLinks[stageNo].value.length === 0 && ytLinks[stageNo].value.length === 0;
-        const missingTimeMin = timeMin[stageNo].value.length === 0 && !dnf[stageNo].checked;
-        const missingTimeSec = timeSec[stageNo].value.length === 0 && !dnf[stageNo].checked;
-        const missingTimeCS = timeCS[stageNo].value.length === 0 && !dnf[stageNo].checked;
+        const thisStageName = stages[stageNo].textContent;
+        const thisReplayFile = replayFiles[stageNo];
+        const thisTwitchLink = twitchLinks[stageNo];
+        const thisYtLink = ytLinks[stageNo];
+        const thisTimeMin = timeMin[stageNo];
+        const thisTimeSec = timeSec[stageNo];
+        const thisTimeCS = timeCS[stageNo];
+        const thisDnf = dnf[stageNo];
+
+        const missingRunRecord = thisReplayFile.files.length === 0 && thisTwitchLink.value.length === 0 && thisYtLink.value.length === 0;
+        const missingTimeMin = thisTimeMin.value.length === 0 && !thisDnf.checked;
+        const missingTimeSec = thisTimeSec.value.length === 0 && !thisDnf.checked;
+        const missingTimeCS = thisTimeCS.value.length === 0 && !thisDnf.checked;
+
+        const ytLink_regexPass = RegExp(thisYtLink.pattern).test(thisYtLink.value);
+        const twitchLink_regexPass = RegExp(thisTwitchLink.pattern).test(thisTwitchLink.value);
 
         toggleAllValidationHighlight(
-            [replayFiles[stageNo].parentNode.querySelector(".uploadBtn_replayFile"), twitchLinks[stageNo], ytLinks[stageNo]],
+            [thisReplayFile.parentNode.querySelector(".uploadBtn_replayFile"), thisTwitchLink, thisYtLink],
             !missingRunRecord
         )
         toggleAllValidationHighlight(
-            [timeMin[stageNo]],
+            [thisTimeMin],
             !missingTimeMin
         )
         toggleAllValidationHighlight(
-            [timeSec[stageNo]],
+            [thisTimeSec],
             !missingTimeSec
         )
         toggleAllValidationHighlight(
-            [timeCS[stageNo]],
+            [thisTimeCS],
             !missingTimeCS
         )
+        if(thisYtLink.value.length > 0) {
+            toggleAllValidationHighlight(
+                [thisYtLink],
+                ytLink_regexPass
+            )
+        }
+        if(thisTwitchLink.value.length > 0) {
+            toggleAllValidationHighlight(
+                [thisTwitchLink],
+                twitchLink_regexPass
+            )
+        }
         if(missingRunRecord) {
-            alert(stages[stageNo].textContent + " has no proof material attached. Please provide one of the following: a replay file, a Twitch link or a YouTube link");
+            alert(thisStageName + " has no proof material attached. Please provide one of the following: a replay file, a Twitch link or a YouTube link");
         }
         if(missingTimeMin) {
-            alert(stages[stageNo].textContent + " has no time (CS) entered. Please enter the correct value (even it it is zero)");
+            alert(thisStageName + " has no time (CS) entered. Please enter the correct value (even it it is zero)");
         }
         if(missingTimeSec) {
-            alert(stages[stageNo].textContent + " has no time (SS) entered. Please enter the correct value (even it it is zero)");
+            alert(thisStageName + " has no time (SS) entered. Please enter the correct value (even it it is zero)");
         }
         if(missingTimeCS) {
-            alert(stages[stageNo].textContent + " has no time (MM) entered. Please enter the correct value (even it it is zero)");
+            alert(thisStageName + " has no time (MM) entered. Please enter the correct value (even it it is zero)");
+        }
+        if(!ytLink_regexPass && thisYtLink.value.length > 0) {
+            alert(thisStageName + " has the YouTube link in a wrong format. Please provide a valid link or leave it empty and provide different proof material instead.");
+        }
+        if(!twitchLink_regexPass && thisTwitchLink.value.length > 0) {
+            alert(thisStageName + " has the Twitch link in a wrong format. Please provide a valid link or leave it empty and provide different proof material instead.");
         }
         if(missingRunRecord || missingTimeMin || missingTimeSec || missingTimeCS) {
             validationSuccessful = false;
