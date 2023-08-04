@@ -150,22 +150,24 @@ class Contest{
     }
     async getResultsFromFirebase() {
         // Get docs (Firebase NoSQL data)
-        const docPromises = [];
+        const collectionPromises = [];
         for(const rally of this.rallies) {
             for(const stage of rally.stages) {
-                for(const participant of this.participants) {
-                    const firebaseDocRef = firestore.collection(stage.name).doc(participant.user.name);
-                    try {
-                        const doc = firebaseDocRef.get();
-                        docPromises.push(doc);
-                    }
-                    catch(error) {
-                        console.log("Error getting document:", error);
-                    }
+                const firebaseDocRef = firestore.collection(stage.name);
+                try {
+                    const collection = firebaseDocRef.get();
+                    collectionPromises.push(collection);
+                }
+                catch(error) {
+                    console.log("Error getting document:", error);
                 }
             }
         }
-        const docs = await Promise.all(docPromises);
+        const collections = await Promise.all(collectionPromises);
+        const docs = [];
+        for(const collection of collections) {
+            docs.push(...collection.docs);
+        }
         
         // Get file lists (Firebase Storage folders)
         const fileListPromises = [];
