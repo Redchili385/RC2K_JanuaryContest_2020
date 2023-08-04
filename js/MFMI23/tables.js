@@ -126,6 +126,15 @@ class Contest{
     getParticipantByName(name){
         return this.participants[this.getParticipantIDByName(name)]
     }
+    getStageByName(name){
+        for(const rally of this.rallies) {
+            for(const stage of rally.stages) {
+                if(stage.name === name) {
+                    return stage;
+                }
+            }
+        }
+    }
     getFinalSummary(){
         if(typeof this.summaryRally !== "undefined"){
             return this.summaryRally
@@ -140,98 +149,122 @@ class Contest{
         return this.summaryRally
     }
     async getResultsFromFirebase() {
-        const promises = [];
+        // Get docs (Firebase NoSQL data)
+        const docPromises = [];
         for(const rally of this.rallies) {
             for(const stage of rally.stages) {
                 for(const participant of this.participants) {
                     const firebaseDocRef = firestore.collection(stage.name).doc(participant.user.name);
                     try {
-                        const doc = await firebaseDocRef.get();
-                        promises.push(doc);
-                        if(doc.exists) {
-                            const data = doc.data();
-                            let time, penalty;
-                            if(data.dnf) {
-                                time = "DNF";
-                            }
-                            else if(data.dsq) {
-                                time = "DSQ";
-                            }
-                            else {
-                                time = new Time(data.time_cs).formattedTime;
-                            }
-                            penalty = data.penalty_cs;
-                            const record = stage.AddRecord(participant, time, penalty, "No");
-                            if(data.yt_link) {
-                                record.proofs.add("youtube", data.yt_link);
-                            }
-                            if(data.twitch_link) {
-                                record.proofs.add("twitch", data.twitch_link);
-                            }
-                            // Get file proofs from storage
-                            const basePathReference = stage.name + "/" + participant.user.name;
-                            const replayPathReference = firebaseStorage.ref(basePathReference + "/replay");
-                            const serviceAreaPathReference = firebaseStorage.ref(basePathReference + "/serviceArea");
-                            const timePathReference = firebaseStorage.ref(basePathReference + "/time");
-                            for(const storageRef of [replayPathReference, serviceAreaPathReference, timePathReference]) {
-                                try {
-                                    const fileList = await storageRef.listAll();
-                                    promises.push(fileList);
-                                    for(const fileRef of fileList.items) {
-                                        try {
-                                            const url = await fileRef.getDownloadURL();
-                                            promises.push(url);
-                                            record.proofs.add(storageRef === replayPathReference ? "replay" : "image", url);
-                                        }
-                                        catch(error) {
-                                            // A full list of error codes is available at
-                                            // https://firebase.google.com/docs/storage/web/handle-errors
-                                            switch (error.code) {
-                                                case 'storage/object-not-found':
-                                                // File doesn't exist
-                                                break;
-                                                case 'storage/unauthorized':
-                                                // User doesn't have permission to access the object
-                                                break;
-                                                case 'storage/canceled':
-                                                // User canceled the upload
-                                                break;
-
-                                                // ...
-
-                                                case 'storage/unknown':
-                                                // Unknown error occurred, inspect the server response
-                                                break;
-                                            }
-                                        };
-                                    };
-                                }
-                                catch(error) {
-                                    console.log(error);
-                                };
-                            };
-                        }
-                        else {
-                            // doc.data() will be undefined in this case
-                            console.log("No such document!");
-                        }
+                        const doc = firebaseDocRef.get();
+                        docPromises.push(doc);
                     }
                     catch(error) {
                         console.log("Error getting document:", error);
                     }
+                }
+            }
+        }
+        const docs = await Promise.all(docPromises);
+        
+        // Get file lists (Firebase Storage folders)
+        const fileListPromises = [];
+        const fileListsDetails = [];
+        for(const doc of docs) {
+            const stage = this.getStageByName(doc.ref.parent.id)
+            const participant = this.getParticipantByName(doc.id)
+            if(doc.exists) {
+
+                // Insert record data
+                const data = doc.data();
+                let time, penalty;
+                if(data.dnf) {
+                    time = "DNF";
+                }
+                else if(data.dsq) {
+                    time = "DSQ";
+                }
+                else {
+                    time = new Time(data.time_cs).formattedTime;
+                }
+                penalty = data.penalty_cs;
+                const record = stage.AddRecord(participant, time, penalty, "No");
+                if(data.yt_link) {
+                    record.proofs.add("youtube", data.yt_link);
+                }
+                if(data.twitch_link) {
+                    record.proofs.add("twitch", data.twitch_link);
+                }
+
+                // Get file proof folders from storage
+                const basePathRef = stage.name + "/" + participant.user.name;
+                const replayPathRef = firebaseStorage.ref(basePathRef + "/replay");
+                const serviceAreaPathRef = firebaseStorage.ref(basePathRef + "/serviceArea");
+                const timePathRef = firebaseStorage.ref(basePathRef + "/time");
+                for(const storageRef of [replayPathRef, serviceAreaPathRef, timePathRef]) {
+                    try {
+                        const fileList = storageRef.listAll();
+                        fileListPromises.push(fileList);
+                        fileListsDetails.push({fileList: fileList, storageRef: storageRef, replayPathRef: replayPathRef, record: record});
+                    }
+                    catch(error) {
+                        console.log(error);
+                    };
+                }
+            }
+            else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+            }
+        }
+        const fileLists = await Promise.all(fileListPromises);
+
+        // Get file URLs (Firebase Storage files)
+        const urlPromises = [];
+        const urlsDetails = [];
+        for(const fileList of fileLists) {
+            for(const fileRef of fileList.items) {
+                try {
+                    const url = fileRef.getDownloadURL();
+                    urlPromises.push(url);
+                    urlsDetails.push({url: url, fileList: fileList})
+                }
+                catch(error) {
+                    // A full list of error codes is available at
+                    // https://firebase.google.com/docs/storage/web/handle-errors
+                    switch (error.code) {
+                        case 'storage/object-not-found':
+                        // File doesn't exist
+                        break;
+                        case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+                        case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+    
+                        // ...
+    
+                        case 'storage/unknown':
+                        // Unknown error occurred, inspect the server response
+                        break;
+                    }
                 };
             };
-        };
-        try {
-            await Promise.all(promises);
-            this.finish();
-            return this.rallies; // Only return the rallies, no need for other data
         }
-        catch(error) {
-            alert("Something went wrong! Please try again.");
-            console.log(error);
-            throw error;
-        };
+        await Promise.all(urlPromises);
+
+        // Add file proofs
+        for(const fileListDetails of fileListsDetails) {
+            for(const urlDetails of urlsDetails) {
+                // Check if URL belongs to current file list
+                if(urlDetails.fileList === fileListDetails.fileList) {
+                    fileListDetails.record.proofs.add(fileListDetails.storageRef === fileListDetails.replayPathRef ? "replay" : "image", urlDetails.url);
+                }
+            }
+        }
+        this.finish();
+        return this.rallies; // Only return the rallies, no need for other data
     };
     finish(){
         this.rallies.forEach(rally => rally.finish())
