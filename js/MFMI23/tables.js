@@ -150,123 +150,47 @@ class Contest{
     }
     async getResultsFromFirebase() {
         // Get docs (Firebase NoSQL data)
-        const collectionPromises = [];
-        for(const rally of this.rallies) {
-            for(const stage of rally.stages) {
-                const firebaseDocRef = firestore.collection(stage.name);
-                try {
-                    const collection = firebaseDocRef.get();
-                    collectionPromises.push(collection);
-                }
-                catch(error) {
-                    console.log("Error getting document:", error);
-                }
-            }
-        }
-        const collections = await Promise.all(collectionPromises);
-        const docs = [];
-        for(const collection of collections) {
-            docs.push(...collection.docs);
-        }
-        
-        // Get file lists (Firebase Storage folders)
-        const fileListPromises = [];
-        const fileListsDetails = [];
-        for(const doc of docs) {
-            const stage = this.getStageByName(doc.ref.parent.id)
-            const participant = this.getParticipantByName(doc.id)
-            if(doc.exists) {
-
-                // Insert record data
-                const data = doc.data();
+        const stages = this.rallies.flatMap(rally => rally.stages)
+        await Promise.all(stages.map(async stage => {
+            const stageCollection = await firestore.collection(stage.name).get()
+            await Promise.all(stageCollection.docs.map(async participantDoc => {
+                const participant = this.getParticipantByName(participantDoc.id)
+                const participantData = participantDoc.data()
                 let time, penalty;
-                if(data.dnf) {
+                if(participantData.dnf) {
                     time = "DNF";
                 }
-                else if(data.dsq) {
+                else if(participantData.dsq) {
                     time = "DSQ";
                 }
                 else {
-                    time = new Time(data.time_cs).formattedTime;
+                    time = new Time(participantData.time_cs).formattedTime;
                 }
-                penalty = data.penalty_cs;
+                penalty = participantData.penalty_cs;
                 const record = stage.AddRecord(participant, time, penalty, "No");
-                if(data.yt_link) {
-                    record.proofs.add("youtube", data.yt_link);
+                if(participantData.yt_link) {
+                    record.proofs.add("youtube", participantData.yt_link);
                 }
-                if(data.twitch_link) {
-                    record.proofs.add("twitch", data.twitch_link);
+                if(participantData.twitch_link) {
+                    record.proofs.add("twitch", participantData.twitch_link);
                 }
-
-                // Get file proof folders from storage
                 const basePathRef = stage.name + "/" + participant.user.name;
-                const replayPathRef = firebaseStorage.ref(basePathRef + "/replay");
-                const serviceAreaPathRef = firebaseStorage.ref(basePathRef + "/serviceArea");
-                const timePathRef = firebaseStorage.ref(basePathRef + "/time");
-                for(const storageRef of [replayPathRef, serviceAreaPathRef, timePathRef]) {
-                    try {
-                        const fileList = storageRef.listAll();
-                        fileListPromises.push(fileList);
-                        fileListsDetails.push({fileList: fileList, storageRef: storageRef, replayPathRef: replayPathRef, record: record});
-                    }
-                    catch(error) {
-                        console.log(error);
-                    };
-                }
-            }
-            else {
-                // doc.data() will be undefined in this case
-                console.log("No such document!");
-            }
-        }
-        const fileLists = await Promise.all(fileListPromises);
-
-        // Get file URLs (Firebase Storage files)
-        const urlPromises = [];
-        const urlsDetails = [];
-        for(const fileList of fileLists) {
-            for(const fileRef of fileList.items) {
-                try {
-                    const url = fileRef.getDownloadURL();
-                    urlPromises.push(url);
-                    urlsDetails.push({url: url, fileList: fileList})
-                }
-                catch(error) {
-                    // A full list of error codes is available at
-                    // https://firebase.google.com/docs/storage/web/handle-errors
-                    switch (error.code) {
-                        case 'storage/object-not-found':
-                        // File doesn't exist
-                        break;
-                        case 'storage/unauthorized':
-                        // User doesn't have permission to access the object
-                        break;
-                        case 'storage/canceled':
-                        // User canceled the upload
-                        break;
-    
-                        // ...
-    
-                        case 'storage/unknown':
-                        // Unknown error occurred, inspect the server response
-                        break;
-                    }
-                };
-            };
-        }
-        await Promise.all(urlPromises);
-
-        // Add file proofs
-        for(const fileListDetails of fileListsDetails) {
-            for(const urlDetails of urlsDetails) {
-                // Check if URL belongs to current file list
-                if(urlDetails.fileList === fileListDetails.fileList) {
-                    fileListDetails.record.proofs.add(fileListDetails.storageRef === fileListDetails.replayPathRef ? "replay" : "image", urlDetails.url);
-                }
-            }
-        }
-        this.finish();
-        return this.rallies; // Only return the rallies, no need for other data
+                const folderRefAndProofTypes = [
+                    {folderRef: firebaseStorage.ref(basePathRef + "/replay"), proofType: "replay"},
+                    {folderRef: firebaseStorage.ref(basePathRef + "/serviceArea"), proofType: "image"},
+                    {folderRef: firebaseStorage.ref(basePathRef + "/time"), proofType: "image"},
+                ]
+                await Promise.all(folderRefAndProofTypes.map(async fileRefAndProofType => {
+                    const { folderRef, proofType } = fileRefAndProofType
+                    const fileList = await folderRef.listAll()
+                    await Promise.all(fileList.items.map(async file => {
+                        const downloadLink = await file.getDownloadURL()
+                        record.proofs.add(proofType, downloadLink)
+                    }))
+                }))
+            }))
+        }))
+        return this.rallies
     };
     finish(){
         this.rallies.forEach(rally => rally.finish())
