@@ -5,7 +5,7 @@ function formSetup() {
     // Should probably move this to contestData...
     const schedule = [
         {
-            date: new Date("2023-08-03"),
+            date: new Date("2023-08-05"),
             stages: ["Clocaenog Mid", "Penmachno South"]
         },
         {
@@ -229,7 +229,7 @@ function generateFormContent(form, currentLeg) {
     const loadingIcon = document.createElement("img");
     const p_successMsg = document.createElement("p");
 
-    setAttributes(loadingIcon, {"id": "loadingIcon", "src": "../../resources/loading.gif", "alt": "Loading..."});
+    setAttributes(loadingIcon, {"id": "loadingIcon", "src": "../../resources/loading_black.png", "alt": "Loading..."});
     setAttributes(p_successMsg, {"id": "successMsg"});
 
     p_successMsg.textContent = "Submission successful! Thank you!";

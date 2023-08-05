@@ -1,9 +1,10 @@
 let contest = contestData();
+let resultSyncPromise;
 if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
     var localStorageContestResults = localStorage.getItem("results");
     if(localStorageContestResults == null){
         let date = new Date().getTime();
-        contest.getResultsFromFirebase()
+        resultSyncPromise = contest.getResultsFromFirebase()
             .then(results => {
                 console.log("Retrieveing results from database...")
                 localStorage.setItem("results", JSON.stringify(results));
@@ -23,7 +24,7 @@ if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
 }
 main(contest);
 
-function main(contest) {
+async function main(contest) {
     console.log("Reading script.js")
     console.log(contest)
     bgRoll();
@@ -53,21 +54,37 @@ function main(contest) {
     // Entry list generator (END)
     
     let buttonSpace = document.getElementById("buttons");
+    let tables = document.getElementById("tables");
     
-    if(buttonSpace){
-        for(let i=0; i< contest.rallies.length; i++){
-            let button = document.createElement("button")
-            button.setAttribute("onclick","loadRallyTables("+ i +")");
-            button.innerHTML = contest.rallies[i].name;
-            buttonSpace.appendChild(button);
+    if(tables) {
+        // Wait for database sync to reveal the tables
+        const loadingIcon = document.createElement("img");
+        loadingIcon.setAttribute("id", "loadingIcon");
+        loadingIcon.setAttribute("src", "../../resources/loading_white.png");
+        loadingIcon.setAttribute("alt", "Loading...");
+        loadingIcon.style.display = "inline";
+        document.body.insertBefore(loadingIcon, tables);
+
+        await resultSyncPromise
+        loadingIcon.style.display = "none";
+        for(const table of document.querySelectorAll(".tables, canvas.tables")) {
+            table.style.display = "block";
         }
-        loadRallyTables(0)
-    }
-    else {
-        contest.getFinalSummary()
-        contest.AddRally(contest.summaryRally);
-        console.log("FinalSummary")
-        loadRallyTables(6);
+        if(buttonSpace){
+            for(let i=0; i< contest.rallies.length; i++){
+                let button = document.createElement("button")
+                button.setAttribute("onclick","loadRallyTables("+ i +")");
+                button.innerHTML = contest.rallies[i].name;
+                buttonSpace.appendChild(button);
+            }
+            loadRallyTables(0)
+        }
+        else {
+            contest.getFinalSummary()
+            contest.AddRally(contest.summaryRally);
+            console.log("FinalSummary")
+            loadRallyTables(6);
+        }
     }
 
     const quickUpdates = document.getElementsByClassName('updateContent');
@@ -130,7 +147,7 @@ function loadRallyTables(RallyID){
     let tables = document.getElementById("tables")
     if(tables === null) return;
     tables.innerHTML = "";
-    let stages = contest.rallies[RallyID].stages
+    let stages = RallyID === 6 ? contest.summaryRally.stages : contest.rallies[RallyID].stages
     let nParticipants = contest.participants.length
 
     let summaryDiv = document.getElementById("rallyboards") || document.getElementById("finalboard")
