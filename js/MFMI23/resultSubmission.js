@@ -419,7 +419,7 @@ function validateResultSubmissionForm() {
         const thisTimeCS = timeCS[stageNo];
         const thisDnf = dnf[stageNo];
 
-        const missingRunRecord = thisReplayFile.files.length === 0 && thisTwitchLink.value.length === 0 && thisYtLink.value.length === 0;
+        const missingRunRecord = thisReplayFile.files.length === 0 && thisTwitchLink.value.length === 0 && thisYtLink.value.length === 0 && !thisDnf.checked;
         const missingTimeMin = thisTimeMin.value.length === 0 && !thisDnf.checked;
         const missingTimeSec = thisTimeSec.value.length === 0 && !thisDnf.checked;
         const missingTimeCS = thisTimeCS.value.length === 0 && !thisDnf.checked;
