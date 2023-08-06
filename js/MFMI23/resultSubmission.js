@@ -5,7 +5,7 @@ function formSetup() {
     // Should probably move this to contestData...
     const schedule = [
         {
-            date: new Date("2023-08-05"),
+            date: new Date("2023-08-07"),
             stages: ["Clocaenog Mid", "Penmachno South"]
         },
         {
@@ -316,6 +316,22 @@ function generateFormContent(form, currentLeg) {
                         }
                     });
                 });
+
+                // Update lastUpdated date in Firestore
+                const updateDate = firebase.firestore.Timestamp.fromDate(new Date());
+                const meta_collection = firestore.collection("metadata");
+                const lastUpdatedUpdateTask = meta_collection.doc("lastUpdated").set({
+                    date: updateDate
+                }).then(() => {
+                    console.log("Database update registered!");
+                }).catch((error) => {
+                    alert("Database update failed!");
+                    console.log(error);
+                    return;
+                });
+                promises.push(lastUpdatedUpdateTask);
+                localStorage.setItem("lastUpdated", updateDate.toString())
+
                 Promise.all(promises)
                 .then(() => {
                     loadingIcon.style.display = "none";

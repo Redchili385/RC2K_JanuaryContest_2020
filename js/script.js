@@ -1,8 +1,22 @@
 let contest = contestData();
 let resultSyncPromise;
+
 if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
+    retrieveContestData();    
+}
+main(contest);
+
+async function retrieveContestData() {
+    // Fetch last updated date from Firebase
+    const lastUpdated = await firestore.collection("metadata").doc("lastUpdated").get();
+    const localStorageLastUpdated = localStorage.getItem("lastUpdated");
+    const lastUpdatedDateString = lastUpdated.data().date.toString();
+    const updatePending = localStorageLastUpdated !== lastUpdatedDateString;
+    console.log(updatePending ? "Database update pending!" : "Website up to date with database!");
+
+    // Retrieve results from database if needed
     var localStorageContestResults = localStorage.getItem("results");
-    if(localStorageContestResults == null){
+    if(localStorageContestResults == null || updatePending){
         let date = new Date().getTime();
         resultSyncPromise = contest.getResultsFromFirebase()
             .then(results => {
@@ -11,6 +25,7 @@ if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
                 contest.updateRecords(results);
                 let date2 = new Date().getTime();
                 console.log("Results retrieved in " + (date2 - date) + " milliseconds")
+                localStorage.setItem("lastUpdated", lastUpdatedDateString);
             })
             .catch(error => {
                 // Handle errors, if needed
@@ -22,7 +37,7 @@ if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
         contest.updateRecords(JSON.parse(localStorageContestResults));
     }
 }
-main(contest);
+
 
 async function main(contest) {
     console.log("Reading script.js")
