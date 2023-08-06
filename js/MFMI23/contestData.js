@@ -35,7 +35,7 @@ function contestData(){
     let Certare =       new Participant(26, website.GetUserByName('Certare'),           participantColor(), 'Peugeot 206 WRC');
     let Komuh =         new Participant(27, website.GetUserByName('Komuh'),             participantColor(), 'Seat Cordoba WRC');
     let PKlima =        new Participant(77, website.GetUserByName('P. Klima'),          participantColor(), 'Mitsubishi Lancer Evo V');
-    contest.participants.push(Erwto, Ephemeral, Lewsys, sBinnala, TheKetrab, datsun100aGTR, Tribell, Migger, SpartaRemixer, Red_T, Certare, Komuh, Pendzior, XsaraTorrada, KarelPipa, PKlima);
+    contest.participants.push(Erwto, Ephemeral, Lewsys, sBinnala, TheKetrab, datsun100aGTR, Tribell, Migger, SpartaRemixer, Red_T, Certare, /*Komuh,*/ Pendzior, XsaraTorrada, KarelPipa, PKlima);
 
     G1.addParticipants([Ephemeral, Komuh, SpartaRemixer, Tribell])
     G2.addParticipants([Pendzior, TheKetrab, Migger, Erwto, Linotrix, Twajlot])
