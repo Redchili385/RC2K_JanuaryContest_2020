@@ -92,7 +92,7 @@ body{
     background-color: white;
     padding: 0;
     cursor: pointer;
-    margin: 10px;
+    margin: 30px;
     transition: transform 0.5s;
 }
 
@@ -119,8 +119,8 @@ body{
 
 .book {
     position: relative;
-    width: 525px;
-    height: 750px;
+    width: 595px;
+    height: 850px;
     transition: transform 0.5s;
 }
 
@@ -189,22 +189,30 @@ body{
 }
 
 #p1 {
-    z-index: 5;
+    z-index: 7;
 }
 
 #p2 {
-    z-index: 4;
+    z-index: 6;
 }
 
 #p3 {
-    z-index: 3;
+    z-index: 5;
 }
 
 #p4 {
-    z-index: 2;
+    z-index: 4;
 }
 
 #p5 {
+    z-index: 3;
+}
+
+#p6 {
+    z-index: 2;
+}
+
+#p7 {
     z-index: 1;
 }
 
