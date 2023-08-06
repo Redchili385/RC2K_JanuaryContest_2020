@@ -142,6 +142,9 @@ function generateFormContent(form, currentLeg) {
 
     form.appendChild(field_driver);
 
+    const field_password = generateFormField("Password", "password", "password", "password", "Secret code given by the officials");
+    form.appendChild(field_password);
+
     // Add form section for each stage
     currentLeg.stages.forEach(stage => {
         const fieldset_stage = document.createElement("fieldset");
@@ -241,11 +244,11 @@ function generateFormContent(form, currentLeg) {
         element.addEventListener("change", resetValidationHighlight);
     });
 
-    button_submit.addEventListener("click", event => {
+    button_submit.addEventListener("click", async event => {
 
         // Insert document into database
         event.preventDefault();
-        const formValidated = validateResultSubmissionForm();
+        const formValidated = await validateResultSubmissionForm();
 
         if(formValidated) {
             loadingIcon.style.display = "inline";
@@ -414,9 +417,18 @@ function displayInputFileName(event) {
     });
 }
 
-function validateResultSubmissionForm() {
+async function isWrongPassword(userName, password) {
+    const userInDB = await firestore.collection("users").doc(userName).get();
+    return password !== userInDB.data().password;
+}
+
+async function validateResultSubmissionForm() {
+    let validationSuccessful = true;
+
     const form = document.forms["resultSubmissionForm"];
     const stages = form.getElementsByClassName("legend_stage");
+    const select_driver = document.getElementById("select_driver");
+    const password = document.getElementById("input_password");
     const dnf = form.getElementsByClassName("input_dnf");
     const replayFiles = form.getElementsByClassName("input_replayFile");
     const twitchLinks = form.getElementsByClassName("input_twitchLink");
@@ -424,7 +436,17 @@ function validateResultSubmissionForm() {
     const timeMin = form.getElementsByClassName("input_timeMin")
     const timeSec = form.getElementsByClassName("input_timeSec")
     const timeCS = form.getElementsByClassName("input_timeCS")
-    let validationSuccessful = true;
+
+    const participant_name = select_driver.options[select_driver.selectedIndex].text;
+    const wrongPassword = await isWrongPassword(participant_name, password.value);
+    toggleAllValidationHighlight(
+        [password],
+        !wrongPassword
+    )
+    if(wrongPassword) {
+        alert("The provided password is incorrect. Please ensure you are entering it correctly and try again!");
+    }
+
     for(let stageNo = 0; stageNo < stages.length; stageNo++) {
         const thisStageName = stages[stageNo].textContent;
         const thisReplayFile = replayFiles[stageNo];
@@ -442,7 +464,6 @@ function validateResultSubmissionForm() {
 
         const ytLink_regexPass = RegExp(thisYtLink.pattern).test(thisYtLink.value);
         const twitchLink_regexPass = RegExp(thisTwitchLink.pattern).test(thisTwitchLink.value);
-
         toggleAllValidationHighlight(
             [thisReplayFile.parentNode.querySelector(".uploadBtn_replayFile"), thisTwitchLink, thisYtLink],
             !missingRunRecord
@@ -489,7 +510,7 @@ function validateResultSubmissionForm() {
         if(!twitchLink_regexPass && thisTwitchLink.value.length > 0) {
             alert(thisStageName + " has the Twitch link in a wrong format. Please provide a valid link or leave it empty and provide different proof material instead.");
         }
-        if(missingRunRecord || missingTimeMin || missingTimeSec || missingTimeCS) {
+        if(wrongPassword || missingRunRecord || missingTimeMin || missingTimeSec || missingTimeCS) {
             validationSuccessful = false;
         }
     }

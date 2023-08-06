@@ -554,7 +554,7 @@ canvas.tables {
     border-radius: 16px;
 }
 
-.fieldset_stage, #field_driver {
+.fieldset_stage, #field_driver, #field_password {
     width: 400px;
 }
 
