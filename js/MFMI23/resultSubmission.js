@@ -333,7 +333,7 @@ function generateFormContent(form, currentLeg) {
                     return;
                 });
                 promises.push(lastUpdatedUpdateTask);
-                localStorage.setItem("lastUpdated", updateDate.toString())
+                // localStorage.setItem("lastUpdated", updateDate.toString())
 
                 Promise.all(promises)
                 .then(() => {
