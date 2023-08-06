@@ -32,6 +32,9 @@ class User{
         this.name = name;
         this.country = country;
     }
+    static fromData(userData) {
+        return new User(userData.name, userData.country);
+    }
 }
 
 class Participant{
@@ -40,7 +43,7 @@ class Participant{
         this.user = user
         this.color = color
         this.car = car
-        this.group = null
+        this.groupNumber = null
         switch(car) {
             case "Mitsubishi Lancer Evo V":
                 this.wcbFactor = 1.05;
@@ -61,6 +64,14 @@ class Participant{
                 this.wcbFactor = 1.00;
         }
     }
+    static fromData(participantData) {
+        const participant = new Participant(participantData.num, User.fromData(participantData.user), participantData.color, participantData.car)
+        participant.groupNumber = participantData.groupNumber
+        return participant
+    }
+    setGroup(group) {
+        this.groupNumber = group.number;
+    }
 }
 
 class Group{
@@ -73,7 +84,7 @@ class Group{
         return `G${this.number}`
     }
     addParticipant(participant){
-        participant.group = this
+        participant.setGroup(this);
         this.participants.push(participant)
     }
     addParticipants(participants){
@@ -91,9 +102,18 @@ class Contest{
         this.rallies = []
         this.groups = []
     }
+    updateRecords(records) {
+        this.rallies = [];
+        records.forEach(rally => {
+            this.AddRally(Rally.fromData(rally));
+        });
+    }
     AddRally(rally){
         rally.id = this.rallies.length;
         this.rallies.push(rally);
+    }
+    getGroupByNumber(groupNumber) {
+        return this.groups.find(group => group.number === groupNumber);
     }
     getParticipantIDByName(name){
         function checkName(participant){
@@ -105,6 +125,15 @@ class Contest{
     }
     getParticipantByName(name){
         return this.participants[this.getParticipantIDByName(name)]
+    }
+    getStageByName(name){
+        for(const rally of this.rallies) {
+            for(const stage of rally.stages) {
+                if(stage.name === name) {
+                    return stage;
+                }
+            }
+        }
     }
     getFinalSummary(){
         if(typeof this.summaryRally !== "undefined"){
@@ -119,6 +148,50 @@ class Contest{
         this.summaryRally.id = 6
         return this.summaryRally
     }
+    async getResultsFromFirebase() {
+        // Get docs (Firebase NoSQL data)
+        const stages = this.rallies.flatMap(rally => rally.stages)
+        await Promise.all(stages.map(async stage => {
+            const stageCollection = await firestore.collection(stage.name).get()
+            await Promise.all(stageCollection.docs.map(async participantDoc => {
+                const participant = this.getParticipantByName(participantDoc.id)
+                const participantData = participantDoc.data()
+                let time, penalty;
+                if(participantData.dnf) {
+                    time = "DNF";
+                }
+                else if(participantData.dsq) {
+                    time = "DSQ";
+                }
+                else {
+                    time = new Time(participantData.time_cs).formattedTime;
+                }
+                penalty = participantData.penalty_cs;
+                const record = stage.AddRecord(participant, time, penalty, "No");
+                if(participantData.yt_link) {
+                    record.proofs.add("youtube", participantData.yt_link);
+                }
+                if(participantData.twitch_link) {
+                    record.proofs.add("twitch", participantData.twitch_link);
+                }
+                const basePathRef = stage.name + "/" + participant.user.name;
+                const folderRefAndProofTypes = [
+                    {folderRef: firebaseStorage.ref(basePathRef + "/replay"), proofType: "replay"},
+                    {folderRef: firebaseStorage.ref(basePathRef + "/serviceArea"), proofType: "image"},
+                    {folderRef: firebaseStorage.ref(basePathRef + "/time"), proofType: "image"},
+                ]
+                await Promise.all(folderRefAndProofTypes.map(async fileRefAndProofType => {
+                    const { folderRef, proofType } = fileRefAndProofType
+                    const fileList = await folderRef.listAll()
+                    await Promise.all(fileList.items.map(async file => {
+                        const downloadLink = await file.getDownloadURL()
+                        record.proofs.add(proofType, downloadLink)
+                    }))
+                }))
+            }))
+        }))
+        return this.rallies
+    };
     finish(){
         this.rallies.forEach(rally => rally.finish())
         this.getFinalSummary().finish()
@@ -130,6 +203,14 @@ class Rally{
         this.id = id;
         this.name = name
         this.stages = []
+    }
+    static fromData(rallyData) {
+        const rally = new Rally(rallyData.name, rallyData.id);
+        rally.stages = rallyData.stages.map(stage => {
+            return Stage.fromData(stage);
+        });
+        rally.finish()
+        return rally;
     }
     getSummary(sortBy = "centiseconds"){
         if(typeof this.summary !== "undefined"){
@@ -197,6 +278,22 @@ class Stage{
             arcade: [],
             simulation: []
         };
+    }
+    static fromData(stageData) {
+        const stage = new Stage(stageData.name, stageData.id);
+        stage.records = stageData.records.map(record => {
+            return Record.fromData(record);
+        });
+        stage.imageUrl = stageData.imageUrl;
+        stage.wr.arcade = stageData.wr.arcade.map(wr => {
+            return WorldRecord.fromData(wr);
+        });
+        stage.wr.simulation = stageData.wr.simulation.map(wr => {
+            return WorldRecord.fromData(wr);
+        });
+        stage.finish();
+        return stage;
+        // rally.getSummary()
     }
     AddRecord(participant, time, penalty, verified){
         let newRecord = Record.fromUserInput(participant,time,penalty,verified)
@@ -325,7 +422,7 @@ class Stage{
                 td = tr.insertCell();
                 td.innerHTML = flagImg;
                 td = tr.insertCell();
-                td.appendChild(document.createTextNode(record.participant.group.name));
+                td.appendChild(document.createTextNode(contest.getGroupByNumber(record.participant.groupNumber).name));
                 td = tr.insertCell();
                 td.appendChild(document.createTextNode(finalTimeToDisplay));
                 tr.innerHTML += finalTimeRow_wcbAdjusted;
@@ -398,6 +495,13 @@ class Record{
         this.gapToLeader = 0;
         this.verified = verified;
         this.proofs = new ProofsWrapper();
+    }
+    static fromData(recordData) {
+        const record = new Record(Participant.fromData(recordData.participant), Time.fromData(recordData.initialTime), Time.fromData(recordData.penalty), RecordStatus.fromData(recordData.status), recordData.verified);
+        recordData.proofs.values.forEach(proof => {
+            record.proofs.add(proof.type, proof.link)
+        });
+        return record;
     }
     static fromUserInput(participant, timeString, penaltyString, verified){
         let initialTime = new Time(0)
@@ -558,6 +662,11 @@ class WorldRecord extends Record{
         super(participant, time, new Time(0), new RecordStatus("FINISHED"), true)
         this.direction = direction
     }
+    static fromData(worldRecordData) {
+        const worldRecord = new WorldRecord(User.fromData(worldRecordData.participant.user), Time.fromData(worldRecordData.finalTime), worldRecordData.direction, worldRecordData.participant.car);
+        return worldRecord;
+        // rally.getSummary()
+    }
     static fromUserInput(user, time, direction, carName){
         return new WorldRecord(user, Time.fromFormattedTime(time), direction, carName)
     }
@@ -573,6 +682,9 @@ class RecordStatus{
             default: this.value = "DNF"
         }
         this.didFinish = this.value === "FINISHED" 
+    }
+    static fromData(recordStatusData) {
+        return new RecordStatus(recordStatusData.value);
     }
     getNextStageStatus(){
         switch(this.value){
@@ -656,6 +768,9 @@ class Time{
         this.formattedTime = Time.centisecondsToTime(centiseconds)
         this.signedFormattedTime = this.centiseconds >= 0 ? `+${this.formattedTime}` : this.formattedTime
     }
+    static fromData(timeData) {
+        return new Time(timeData.centiseconds)
+    }
     static fromFormattedTime(formattedTime){
         if(!this.isValidTimeString(formattedTime))
             return null
@@ -688,7 +803,7 @@ class Time{
             time = time.slice(1)
         }
         let index = time.lastIndexOf('.')
-        centiseconds += parseInt(time.slice(index+1,index+3))
+        centiseconds += parseInt(time.slice(index+1,index+3))   // centiseconds
         time = time.slice(0,index)
         index = time.lastIndexOf(':')
         centiseconds += 100 * parseInt(time.slice(index+1, time.length))   //seconds
@@ -697,7 +812,7 @@ class Time{
         centiseconds += 60 * 100 * parseInt(time.slice(index+1, time.length)) //minutes
         if(index === -1) return centiseconds;
         time = time.slice(0, index)
-        centiseconds += 60 * 60 * 100 * parseInt(time.slice) //hours
+        centiseconds += 60 * 60 * 100 * parseInt(time) //hours
         if(isNegative){
             centiseconds = -centiseconds
         }

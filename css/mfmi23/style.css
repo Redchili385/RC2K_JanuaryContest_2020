@@ -59,7 +59,7 @@ body{
     text-decoration: none;
 }
 
-.navspan{
+.navspan {
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
@@ -71,7 +71,7 @@ body{
     color: yellow;
 }
 
-#nav button{
+#nav button {
     padding: 0;
     border: none;
     background: none;
@@ -267,21 +267,21 @@ body{
     width: 640px;
 }
 
-#showModalBtn {
+.altBtn {
     background-color: #EEE;
     border: 1px solid black;
     border-radius: 8px;
 }
 
-#showModalBtn:focus {
+.altBtn:focus {
     outline: none;
 }
 
-#showModalBtn:hover {
+.altBtn:hover {
     background-color: #CCC;
 }
 
-#showModalBtn:active {
+.altBtn:active {
     
     background-color: #AAA;
 }
@@ -301,7 +301,7 @@ body{
     color: #CCC;
 }
 
-#buttons{
+#buttons {
     margin: 0 150px 10px 150px;
     display: flex;
     align-items: stretch;
@@ -309,18 +309,18 @@ body{
     font-family: "Trebuchet MS";
 }
 
-#buttons button{
+#buttons button {
     border-radius: 50vh;
     font-weight: 600;
     margin: 0px 3px;
     background: linear-gradient(45deg, white 33.3%, #DDD 66.7%, #BBB 100%);
 }
 
-#buttons button:hover{
+#buttons button:hover {
     background: linear-gradient(45deg, #BBB 33.3%, #DDD 66.7%, white 100%);
 }
 
-.tables{
+.tables {
     background-color: rgba(52,58,64,0.75);
     padding: 10px 10px 10px 10px;
     font-size: 1vw;
@@ -328,7 +328,7 @@ body{
 }
 
 
-.tables table{
+.tables table {
     background-color: #FFF;
     margin-bottom: 0px;
     padding-right: 10px;
@@ -422,7 +422,7 @@ body{
     margin-bottom: 0;
 }
 
-.divStage{
+.divStage {
     vertical-align: top;
     display: inline-flex;
     background: #343a40;
@@ -431,25 +431,25 @@ body{
     width: 100%;
 }
 
-.divStageTables{
+.divStageTables {
     flex-direction: column;
     width: 100%;
 }
 
-.orderText{
+.orderText {
     padding: 10px 0px 10px 0px;
 }
 
-h1, h2, h3, h4, h5, h6{
+h1, h2, h3, h4, h5, h6 {
     color: white;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
-.stageName{
+.stageName {
     font-size: 1.7em;
 }
 
-.divTitleImage{
+.divTitleImage {
     width: 30%;
     display: inline-block;
     padding: 1vw;
@@ -458,14 +458,17 @@ h1, h2, h3, h4, h5, h6{
     font-style: italic;
 }
 
-.mapImage{
+.mapImage {
     width: 100%;
 }
 
-canvas.tables{
+canvas.tables {
     width: 80% !important;
-    display: initial !important;
     background-color: white;
+}
+
+.tables {
+    display: none;
 }
 
 .updateCollapsible {
@@ -517,4 +520,160 @@ canvas.tables{
 
 .updateRallyWinner {
     text-align: center;
+}
+
+/* Result submission form */
+#resultSubmissionForm {
+    width: 480px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #fff;
+    border: 10px solid #343a40;
+}
+
+#resultSubmissionFormHeader {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #343a40;
+}
+
+#resultSubmissionFormHeader > * {
+    font-weight: bold;
+}
+
+#resultSubmissionForm > * {
+    margin: 0 auto;
+}
+
+#currentLegHeader {
+    margin: 0;
+}
+
+#currentLegSubheader {
+    margin: 10px 0;
+}
+
+.fieldset_stage {
+    width: fit-content;
+    padding: revert;
+    border: 2px double #333;
+    border-radius: 16px;
+}
+
+.fieldset_stage, #field_driver, #field_password {
+    width: 400px;
+}
+
+.legend_stage {
+    width: auto;
+    margin: 0 0 -8px 0; /* Mitigate the unwanted 8px flex gap */
+    padding: 0 8px;
+    font-weight: bold;
+}
+
+#submitResult {
+    margin-bottom: 16px;
+    border: none;
+    background: none;
+    outline: none;
+}
+
+.fieldset_stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.formField {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.formField label {
+    font-size: 0.9rem;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.formField input, #select_driver {
+    width: 100%;
+    padding: 1px 6px;
+    border: 1px solid black;
+}
+
+.formField input {
+    border-radius: 8px;
+}
+
+#select_driver {
+    border-radius: 8px 8px 0 0;
+}
+
+#select_driver option:last-of-type {
+    border-radius: 0 0 8px 8px;
+    border: 15px black solid;
+}
+
+.time {
+    width: 100%;
+    display: flex;
+    align-items: end;
+}
+
+.time > .formField {
+    margin: 0;
+}
+
+.time > span {
+    padding: 0 1px 3px 1px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.uploadBtn {
+    width: min-content;
+    cursor: pointer;
+    padding: 1px 6px;
+}
+
+.formField label:not(.uploadBtn) {
+    width: fit-content;
+    cursor: text;
+}
+
+.uploadBtnContainer {
+    text-align: left;
+}
+
+.p_fileName {
+    margin: 0 0 0 4px;
+    display: inline-block;
+    font-size: 0.8rem;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+#select_driver {
+    width: 100%;
+}
+
+#successMsg, #loadingIcon {
+    display: none;
+}
+
+.formField .input_dnf {
+    width: fit-content;
+}
+
+input:disabled {
+    background-color: #EEE;
 }
