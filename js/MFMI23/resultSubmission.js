@@ -37,7 +37,7 @@ function formSetup() {
             stages: ["Riccarton", "Newcastleton"]
         },
         {
-            date: new Date("2023-08-07"),
+            date: new Date("2023-08-15"),
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
