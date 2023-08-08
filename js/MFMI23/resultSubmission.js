@@ -5,75 +5,75 @@ function formSetup() {
     // Should probably move this to contestData...
     const schedule = [
         {
-            date: new Date("2023-08-07"),
+            date: new Date("2023-08-07T20:00:00Z"),
             stages: ["Clocaenog Mid", "Penmachno South"]
         },
         {
-            date: new Date("2023-08-08"),
+            date: new Date("2023-08-08T20:00:00Z"),
             stages: ["Myherin", "Hafren"]
         },
         {
-            date: new Date("2023-08-09"),
+            date: new Date("2023-08-09T20:00:00Z"),
             stages: ["Dyfi", "Gartheiniog"]
         },
         {
-            date: new Date("2023-08-10"),
+            date: new Date("2023-08-10T20:00:00Z"),
             stages: ["Chirdonhead"]
         },
         {
-            date: new Date("2023-08-11"),
+            date: new Date("2023-08-11T20:00:00Z"),
             stages: ["Falstone"]
         },
         {
-            date: new Date("2023-08-12"),
+            date: new Date("2023-08-12T20:00:00Z"),
             stages: ["Kershope"]
         },
         {
-            date: new Date("2023-08-13"),
+            date: new Date("2023-08-13T20:00:00Z"),
             stages: ["Pundershaw"]
         },
         {
-            date: new Date("2023-08-14"),
+            date: new Date("2023-08-14T20:00:00Z"),
             stages: ["Riccarton", "Newcastleton"]
         },
         {
-            date: new Date("2023-08-15"),
+            date: new Date("2023-08-15T20:00:00Z"),
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
-            date: new Date("2023-08-16"),
+            date: new Date("2023-08-16T20:00:00Z"),
             stages: ["Black Loch", "Glentrool"]
         },
         {
-            date: new Date("2023-08-17"),
+            date: new Date("2023-08-17T20:00:00Z"),
             stages: ["Ae"]
         },
         {
-            date: new Date("2023-08-18"),
+            date: new Date("2023-08-18T20:00:00Z"),
             stages: ["Moon and Star", "Bothwell", "Whitchester"]
         },
         {
-            date: new Date("2023-08-19"),
+            date: new Date("2023-08-19T20:00:00Z"),
             stages: ["Eccles", "Langton", "Fogo"]
         },
         {
-            date: new Date("2023-08-20"),
+            date: new Date("2023-08-20T20:00:00Z"),
             stages: ["Hamilton's Folly", "Tyrones Ditches"]
         },
         {
-            date: new Date("2023-08-21"),
+            date: new Date("2023-08-21T20:00:00Z"),
             stages: ["Feeney", "Parkanaur"]
         },
         {
-            date: new Date("2023-08-22"),
+            date: new Date("2023-08-22T20:00:00Z"),
             stages: ["Lisnamuck", "Tardree"]
         },
         {
-            date: new Date("2023-08-23"),
+            date: new Date("2023-08-23T20:00:00Z"),
             stages: ["Port Soderick", "Ballagyr", "Curraghs"]
         },
         {
-            date: new Date("2023-08-24"),
+            date: new Date("2023-08-24T20:00:00Z"),
             stages: ["Tholt-y-Will", "Injerbreck", "Cringle"]
         }
     ];
@@ -87,7 +87,7 @@ function formSetup() {
 
 // Checks if two dates are on the same day (UNIX timestamp)
 function isSameDay(date1, date2) {
-    const differenceInMilliseconds = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate()) - Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    const differenceInMilliseconds = date2 - date1
     const differenceInDays = Math.floor(differenceInMilliseconds/1000/60/60/24);
     return differenceInDays === 0;
 }
