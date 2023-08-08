@@ -219,7 +219,6 @@ class Rally{
         this.id = id;
         this.name = name
         this.stages = []
-        console.log(this.stages)
     }
     static fromData(rallyData) {
         const rally = new Rally(rallyData.name, rallyData.id);
