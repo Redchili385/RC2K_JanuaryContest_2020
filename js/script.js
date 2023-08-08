@@ -179,13 +179,13 @@ function loadRallyTables(RallyID){
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables, 0) 
         }
-        contest.rallies[RallyID].getSummary(nParticipants).CreateContestEntireStageTable(summaryDiv, 1)
+        contest.rallies[RallyID].getSummary(nParticipants, !hasLegFinished(stages[stages.length - 1])).CreateContestEntireStageTable(summaryDiv, 1)
     }
     else{
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables,2)
         }
-        contest.rallies[RallyID].getSummary(nParticipants).CreateContestEntireStageTable(summaryDiv, 3)
+        contest.rallies[RallyID].getSummary(nParticipants, !hasLegFinished(stages[stages.length - 1])).CreateContestEntireStageTable(summaryDiv, 3)
     }
    
     //CHART.js 

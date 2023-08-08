@@ -228,7 +228,7 @@ class Rally{
         rally.finish()
         return rally;
     }
-    getSummary(sortBy = "centiseconds"){
+    getSummary(sortBy = "centiseconds", omitLatestStage = false){
         if(typeof this.summary !== "undefined"){
             return this.summary
         }
@@ -260,6 +260,10 @@ class Rally{
         }
         RallyRecord.assignRanks(this.summary.records)
         ContestRecord.sortBy(this.summary.records, sortBy);
+        // Remove last record if e.g. the given leg hasn't finished yet
+        if(omitLatestStage) {
+            this.summary.records.pop();
+        }
         return this.summary;
     }
     getWorldRecords(){
@@ -400,7 +404,7 @@ class Stage{
         const legOfThisStage = contest.schedule.find(leg => {
             return leg.stages.includes(finalLevel === 0 ? this.name : contest.getStageByID(this.id - ((finalLevel === 3) ? 1 : 0.5)).name);
         });
-        if(legOfThisStage.date >= currentLeg.date) { // If this leg hasn't finished yet, don't display the results
+        if(finalLevel === 0 && legOfThisStage.date >= currentLeg.date || finalLevel !== 0 && this.records.length === 0) { // If this leg hasn't finished yet, don't display the results
             newTable.innerHTML+=`<tr id="emptyFinalTable"><td style="color: gray;" colspan="100%" rowspan="2" >The results aren't complete yet. Please check back later.</td></tr>`;
         }
         else {
