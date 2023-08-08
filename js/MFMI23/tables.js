@@ -398,7 +398,7 @@ class Stage{
             return isSameDay(leg.date, new Date());
         });
         const legOfThisStage = contest.schedule.find(leg => {
-            return leg.stages.includes(finalLevel === 0 ? this.name : contest.getStageByID(this.id - 0.5).name);
+            return leg.stages.includes(finalLevel === 0 ? this.name : contest.getStageByID(this.id - ((finalLevel === 3) ? 1 : 0.5)).name);
         });
         if(legOfThisStage.date >= currentLeg.date) { // If this leg hasn't finished yet, don't display the results
             newTable.innerHTML+=`<tr id="emptyFinalTable"><td style="color: gray;" colspan="100%" rowspan="2" >The results aren't complete yet. Please check back later.</td></tr>`;
@@ -492,7 +492,7 @@ class Stage{
         divStage.appendChild(newTable);
     }
     getImageUrl(){
-        if(typeof(this.id) !== "undefined" && Math.round(this.id) === this.id){
+        if(typeof(this.id) !== "undefined" && Math.round(this.id) === this.id && this.id < 36){
             return "../../resources/Stages/Images/stage"+ (this.id <10 ?"0":"") + this.id + ".png";
         }
         return this.imageURL;

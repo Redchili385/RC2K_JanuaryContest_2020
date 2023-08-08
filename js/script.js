@@ -189,20 +189,13 @@ function loadRallyTables(RallyID){
     }
    
     //CHART.js 
-    const currentLeg = contest.schedule.find(leg => {
-        return isSameDay(leg.date, new Date());
-    });
-    
     let stage_minimum = []
     let participants_centiseconds = []
     let participants = []
     let stage_records = []
 
     for(let i=0; i< stages.length; i++){
-        const legOfThisStage = contest.schedule.find(leg => {
-            return leg.stages.includes(stages[i].name);
-        });
-        if(legOfThisStage.date < currentLeg.date) { // If this leg hasn't finished yet, don't display the results
+        if(hasLegFinished(stages[i])) { // If this leg hasn't finished yet, don't display the results
             let records = stages[i].records;
             stage_records[i] = stages[i].wr["simulation"][0]; //0 = first place
             stage_minimum[i] = Number.POSITIVE_INFINITY;
@@ -327,4 +320,17 @@ function loadRallyTables(RallyID){
     else{
         chart_record = new Chart(ctx_record, Data_record);
     } 
+}
+
+function hasLegFinished(stage) {
+    if(contest.name !== "Magnetic Fields Memorial Invitational 2023") {
+        return true;
+    }
+    const currentLeg = contest.schedule.find(leg => {
+        return isSameDay(leg.date, new Date());
+    });
+    const legOfThisStage = contest.schedule.find(leg => {
+        return leg.stages.includes(Math.round(stage.id) !== stage.id ? contest.getStageByID(stage.id - 0.5).name : stage.name);
+    });
+    return legOfThisStage.date < currentLeg.date;
 }
