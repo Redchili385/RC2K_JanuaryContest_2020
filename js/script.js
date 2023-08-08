@@ -2,7 +2,7 @@ let contest = contestData();
 let resultSyncPromise;
 
 if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
-    retrieveContestData();    
+    resultSyncPromise = retrieveContestData();    
 }
 main(contest);
 
@@ -18,7 +18,7 @@ async function retrieveContestData() {
     var localStorageContestResults = localStorage.getItem("results");
     if(localStorageContestResults == null || updatePending){
         let date = new Date().getTime();
-        resultSyncPromise = contest.getResultsFromFirebase()
+        return contest.getResultsFromFirebase()
             .then(results => {
                 console.log("Retrieveing results from database...")
                 localStorage.setItem("results", JSON.stringify(results));
