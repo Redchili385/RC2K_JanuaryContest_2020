@@ -101,6 +101,7 @@ class Contest{
         this.participants = []
         this.rallies = []
         this.groups = []
+        this.schedule = []
     }
     updateRecords(records) {
         this.rallies = [];
@@ -126,6 +127,15 @@ class Contest{
     getParticipantByName(name){
         return this.participants[this.getParticipantIDByName(name)]
     }
+    getStageByID(id){
+        for(const rally of this.rallies) {
+            for(const stage of rally.stages) {
+                if(stage.id === id) {
+                    return stage;
+                }
+            }
+        }
+    }
     getStageByName(name){
         for(const rally of this.rallies) {
             for(const stage of rally.stages) {
@@ -147,6 +157,12 @@ class Contest{
         }
         this.summaryRally.id = 6
         return this.summaryRally
+    }
+    getSchedule(){
+        return this.schedule;
+    }
+    setSchedule(schedule){
+        this.schedule = schedule;
     }
     async getResultsFromFirebase() {
         // Get docs (Firebase NoSQL data)
@@ -203,6 +219,7 @@ class Rally{
         this.id = id;
         this.name = name
         this.stages = []
+        console.log(this.stages)
     }
     static fromData(rallyData) {
         const rally = new Rally(rallyData.name, rallyData.id);
@@ -217,7 +234,7 @@ class Rally{
             return this.summary
         }
         this.summary = new Stage(this.name + " Summary");
-        this.summary.index = 6
+        this.summary.id = this.stages[this.stages.length - 1].id + 0.5
         this.summary.imageURL = "../../resources/rally" + this.id + ".PNG";
         const stageRecordsByParticipant = {}
         this.stages.forEach(stage => {
@@ -377,7 +394,14 @@ class Stage{
         let newTableBody = document.createElement('tbody');
         newTable.appendChild(newTableBody);
 
-        if (this.records.length === 0) { // Fills empty tables with a "Check back later" message.
+        // if (this.records.length === 0) { // Fills empty tables with a "Check back later" message.
+        const currentLeg = contest.schedule.find(leg => {
+            return isSameDay(leg.date, new Date());
+        });
+        const legOfThisStage = contest.schedule.find(leg => {
+            return leg.stages.includes(finalLevel === 0 ? this.name : contest.getStageByID(this.id - 0.5).name);
+        });
+        if(legOfThisStage.date >= currentLeg.date) { // If this leg hasn't finished yet, don't display the results
             newTable.innerHTML+=`<tr id="emptyFinalTable"><td style="color: gray;" colspan="100%" rowspan="2" >The results aren't complete yet. Please check back later.</td></tr>`;
         }
         else {
@@ -469,7 +493,7 @@ class Stage{
         divStage.appendChild(newTable);
     }
     getImageUrl(){
-        if(typeof(this.id) !== "undefined"){
+        if(typeof(this.id) !== "undefined" && Math.round(this.id) === this.id){
             return "../../resources/Stages/Images/stage"+ (this.id <10 ?"0":"") + this.id + ".png";
         }
         return this.imageURL;

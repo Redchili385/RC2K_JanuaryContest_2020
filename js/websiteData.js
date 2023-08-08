@@ -354,7 +354,7 @@ function websiteData(){
     {
         rally = new Rally("Seat Jim Clark Memorial Rally")
 
-        stage = new Stage("Moon and star");
+        stage = new Stage("Moon and Star");
         wr = stage.AddArcadeWorldRecord(Spartax, "02:45.38")
         wr.proofs.add("image", "https://cdn.discordapp.com/attachments/199990758089031680/578638904169594919/ral_2019-05-16_19-44-05-54.png")
         wr = stage.AddArcadeWorldRecord(Komuh, "02:49.33");
@@ -578,7 +578,7 @@ function websiteData(){
         wr.proofs.add("youtube", "https://www.youtube.com/watch?v=pQOsWg3GoIM")
         rally.stages[2] = stage;
 
-        stage = new Stage("Tholt-y-will");
+        stage = new Stage("Tholt-y-Will");
         wr = stage.AddArcadeWorldRecord(Spartax, "02:51.33")
         wr.proofs.add("image", "https://cdn.discordapp.com/attachments/199990758089031680/603209347694198784/ral_2019-07-23_14-57-49-48.png")
         wr.proofs.add("replay", "https://drive.google.com/file/d/15crs4ZUl0FDpJY1BSNem_eFcAbDN23iR/view?usp=sharing")
