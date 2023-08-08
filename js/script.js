@@ -189,6 +189,9 @@ function loadRallyTables(RallyID){
     }
    
     //CHART.js 
+    const currentLeg = contest.schedule.find(leg => {
+        return isSameDay(leg.date, new Date());
+    });
     
     let stage_minimum = []
     let participants_centiseconds = []
@@ -196,20 +199,25 @@ function loadRallyTables(RallyID){
     let stage_records = []
 
     for(let i=0; i< stages.length; i++){
-        let records = stages[i].records;
-        stage_records[i] = stages[i].wr["simulation"][0]; //0 = first place
-        stage_minimum[i] = Number.POSITIVE_INFINITY;
-        for(let j=0; j< records.length; j++){
-            let record = records[j]
-            if(record.status.didFinish){
-                const participantName = record.participant.user.name
-                const centiseconds = record.finalTime.centiseconds
-                if(participants_centiseconds[participantName] === undefined)
-                    participants_centiseconds[participantName] = [];
-                participants_centiseconds[participantName][i] = centiseconds;
-                participants[participantName] = record.participant;
-                if(centiseconds < stage_minimum[i]) 
-                    stage_minimum[i] = centiseconds;
+        const legOfThisStage = contest.schedule.find(leg => {
+            return leg.stages.includes(stages[i].name);
+        });
+        if(legOfThisStage.date < currentLeg.date) { // If this leg hasn't finished yet, don't display the results
+            let records = stages[i].records;
+            stage_records[i] = stages[i].wr["simulation"][0]; //0 = first place
+            stage_minimum[i] = Number.POSITIVE_INFINITY;
+            for(let j=0; j< records.length; j++){
+                let record = records[j]
+                if(record.status.didFinish){
+                    const participantName = record.participant.user.name
+                    const centiseconds = record.finalTime.centiseconds
+                    if(participants_centiseconds[participantName] === undefined)
+                        participants_centiseconds[participantName] = [];
+                    participants_centiseconds[participantName][i] = centiseconds;
+                    participants[participantName] = record.participant;
+                    if(centiseconds < stage_minimum[i]) 
+                        stage_minimum[i] = centiseconds;
+                }
             }
         }
     }
