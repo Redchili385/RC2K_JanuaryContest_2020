@@ -174,18 +174,23 @@ function loadRallyTables(RallyID){
     let graphDiv_record = document.getElementById('myChart_record')
     graphDiv_record.innerHTML = "";
 
-
+    let stagesToOmit = []
+    if(!hasLegFinished(stages[stages.length - 1])) {
+        for(const stage of contest.getCurrentLeg().stages) {
+            stagesToOmit.push(stage);
+        }
+    }
     if(RallyID !== 6){
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables, 0) 
         }
-        contest.rallies[RallyID].getSummary(nParticipants, !hasLegFinished(stages[stages.length - 1])).CreateContestEntireStageTable(summaryDiv, 1)
+        contest.rallies[RallyID].getSummary(nParticipants, stagesToOmit).CreateContestEntireStageTable(summaryDiv, 1)
     }
     else{
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables,2)
         }
-        contest.rallies[RallyID].getSummary(nParticipants, !hasLegFinished(stages[stages.length - 1])).CreateContestEntireStageTable(summaryDiv, 3)
+        contest.rallies[RallyID].getSummary(nParticipants, stagesToOmit).CreateContestEntireStageTable(summaryDiv, 3)
     }
    
     //CHART.js 
@@ -326,11 +331,7 @@ function hasLegFinished(stage) {
     if(contest.name !== "Magnetic Fields Memorial Invitational 2023") {
         return true;
     }
-    const currentLeg = contest.schedule.find(leg => {
-        return isSameDay(leg.date, new Date());
-    });
-    const legOfThisStage = contest.schedule.find(leg => {
-        return leg.stages.includes(Math.round(stage.id) !== stage.id ? contest.getStageByID(stage.id - 0.5).name : stage.name);
-    });
+    const currentLeg = contest.getCurrentLeg();
+    const legOfThisStage = contest.getLegOfStage(stage);
     return legOfThisStage.date < currentLeg.date;
 }

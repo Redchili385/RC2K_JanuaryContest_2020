@@ -164,6 +164,16 @@ class Contest{
     setSchedule(schedule){
         this.schedule = schedule;
     }
+    getCurrentLeg() {
+        return contest.schedule.find(leg => {
+            return isSameDay(leg.date, new Date());
+        });
+    }
+    getLegOfStage(stage) {
+        return contest.schedule.find(leg => {
+            return leg.stages.includes(Math.round(stage.id) !== stage.id ? contest.getStageByID(stage.id - 0.5).name : stage.name);
+        });
+    }
     async getResultsFromFirebase() {
         // Get docs (Firebase NoSQL data)
         const stages = this.rallies.flatMap(rally => rally.stages)
@@ -228,8 +238,8 @@ class Rally{
         rally.finish()
         return rally;
     }
-    getSummary(sortBy = "centiseconds", omitLatestStage = false){
-        if(typeof this.summary !== "undefined"){
+    getSummary(sortBy = "centiseconds", stagesToOmit = []){
+        if(typeof this.summary !== "undefined" && stagesToOmit.length === 0){
             return this.summary
         }
         this.summary = new Stage(this.name + " Summary");
@@ -237,13 +247,15 @@ class Rally{
         this.summary.imageURL = "../../resources/rally" + this.id + ".PNG";
         const stageRecordsByParticipant = {}
         this.stages.forEach(stage => {
-            stage.records.forEach(record => {
-                const participantName = record.participant.user.name
-                if(!(participantName in stageRecordsByParticipant)){
-                    stageRecordsByParticipant[participantName] = []
-                }
-                stageRecordsByParticipant[participantName].push(record)
-            })
+            if(!stagesToOmit.includes(stage.name)) {
+                stage.records.forEach(record => {
+                    const participantName = record.participant.user.name
+                    if(!(participantName in stageRecordsByParticipant)){
+                        stageRecordsByParticipant[participantName] = []
+                    }
+                    stageRecordsByParticipant[participantName].push(record)
+                })
+            }
         })
         this.summary.records = []
         for(const participantName in stageRecordsByParticipant){
@@ -260,10 +272,6 @@ class Rally{
         }
         RallyRecord.assignRanks(this.summary.records)
         ContestRecord.sortBy(this.summary.records, sortBy);
-        // Remove last record if e.g. the given leg hasn't finished yet
-        if(omitLatestStage) {
-            this.summary.records.pop();
-        }
         return this.summary;
     }
     getWorldRecords(){
@@ -398,12 +406,8 @@ class Stage{
         newTable.appendChild(newTableBody);
 
         // if (this.records.length === 0) { // Fills empty tables with a "Check back later" message.
-        const currentLeg = contest.schedule.find(leg => {
-            return isSameDay(leg.date, new Date());
-        });
-        const legOfThisStage = contest.schedule.find(leg => {
-            return leg.stages.includes(finalLevel === 0 ? this.name : contest.getStageByID(this.id - ((finalLevel === 3) ? 1 : 0.5)).name);
-        });
+        const currentLeg = contest.getCurrentLeg();
+        const legOfThisStage = contest.getLegOfStage(this)
         if(finalLevel === 0 && legOfThisStage.date >= currentLeg.date || finalLevel !== 0 && this.records.length === 0) { // If this leg hasn't finished yet, don't display the results
             newTable.innerHTML+=`<tr id="emptyFinalTable"><td style="color: gray;" colspan="100%" rowspan="2" >The results aren't complete yet. Please check back later.</td></tr>`;
         }
