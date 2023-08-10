@@ -408,7 +408,8 @@ class Stage{
         // if (this.records.length === 0) { // Fills empty tables with a "Check back later" message.
         const currentLeg = contest.getCurrentLeg();
         const legOfThisStage = contest.getLegOfStage(this)
-        if(finalLevel === 0 && legOfThisStage.date >= currentLeg.date || finalLevel !== 0 && this.records.length === 0) { // If this leg hasn't finished yet, don't display the results
+        // if(finalLevel === 0 && legOfThisStage.date >= currentLeg.date || finalLevel !== 0 && this.records.length === 0) { // If this leg hasn't finished yet, don't display the results
+        if(true) {
             newTable.innerHTML+=`<tr id="emptyFinalTable"><td style="color: gray;" colspan="100%" rowspan="2" >The results aren't complete yet. Please check back later.</td></tr>`;
         }
         else {

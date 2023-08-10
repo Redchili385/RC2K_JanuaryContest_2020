@@ -200,7 +200,8 @@ function loadRallyTables(RallyID){
     let stage_records = []
 
     for(let i=0; i< stages.length; i++){
-        if(hasLegFinished(stages[i])) { // If this leg hasn't finished yet, don't display the results
+        // if(hasLegFinished(stages[i])) { // If this leg hasn't finished yet, don't display the results
+        if(false) {
             let records = stages[i].records;
             stage_records[i] = stages[i].wr["simulation"][0]; //0 = first place
             stage_minimum[i] = Number.POSITIVE_INFINITY;
