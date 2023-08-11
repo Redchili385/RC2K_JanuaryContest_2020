@@ -206,7 +206,7 @@ function contestData(){
         wr.proofs.add("image", "https://drive.google.com/file/d/1kIP24Hn7VueHhkFkOdBJXRRpnRA8gPIH/view?usp=sharing")
         wr = stage.AddRecord(Migger, "12:48.36", "00:00.00", "No")
         wr.proofs.add("image", "https://drive.google.com/file/d/1f4Jqm04cxyjby_cweQnvZ2jOrop_LwPk/view?usp=sharing")
-        wr = stage.AddRecord(Pendzior, "12:21.83", "00:00.00", "No")
+        wr = stage.AddRecord(Pendzior, "12:11.83", "00:00.00", "No")
         wr.proofs.add("image", "https://drive.google.com/file/d/1uUE9Ie0RQAK3bK-713W-vR4KPWCVF3jy/view?usp=sharing")
         wr = stage.AddRecord(sBinnala, "12:39.86", "00:00.00", "Yes")
         wr.proofs.add("image", "https://drive.google.com/file/d/12jtT9uq1UASB50QKA6p2EnTIzCNS8jVh/view?usp=sharing")
