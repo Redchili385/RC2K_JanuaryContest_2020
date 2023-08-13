@@ -145,14 +145,23 @@ class Contest{
             }
         }
     }
-    getFinalSummary(){
-        if(typeof this.summaryRally !== "undefined"){
-            return this.summaryRally
+    getRallyByStageName(name){
+        for(const rally of this.rallies) {
+            for(const stage of rally.stages) {
+                if(stage.name === name) {
+                    return rally;
+                }
+            }
         }
+    }
+    getFinalSummary(stagesToOmit = []){
+        // if(typeof this.summaryRally !== "undefined"){
+        //     return this.summaryRally
+        // }
         this.summaryRally = new Rally("Final")
         for(let i = 0; i< this.rallies.length; i++){
             let rally = this.rallies[i];
-            let summaryRally_stage = rally.getSummary()  // Stage object
+            let summaryRally_stage = rally.getSummary("centiseconds", stagesToOmit)  // Stage object
             this.summaryRally.stages.push(summaryRally_stage)
         }
         this.summaryRally.id = 6
@@ -218,9 +227,9 @@ class Contest{
         }))
         return this.rallies
     };
-    finish(){
+    finish(stagesToOmit = []){
         this.rallies.forEach(rally => rally.finish())
-        this.getFinalSummary().finish()
+        this.getFinalSummary(stagesToOmit).finish()
     }
 }
 

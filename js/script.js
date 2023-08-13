@@ -95,9 +95,6 @@ async function main(contest) {
             loadRallyTables(0)
         }
         else {
-            contest.getFinalSummary()
-            contest.AddRally(contest.summaryRally);
-            console.log("FinalSummary")
             loadRallyTables(6);
         }
     }
@@ -162,7 +159,7 @@ function loadRallyTables(RallyID){
     let tables = document.getElementById("tables")
     if(tables === null) return;
     tables.innerHTML = "";
-    let stages = RallyID === 6 ? contest.summaryRally.stages : contest.rallies[RallyID].stages
+    let stages;
     let nParticipants = contest.participants.length
 
     let summaryDiv = document.getElementById("rallyboards") || document.getElementById("finalboard")
@@ -175,18 +172,31 @@ function loadRallyTables(RallyID){
     graphDiv_record.innerHTML = "";
 
     let stagesToOmit = []
-    if(!hasLegFinished(stages[stages.length - 1])) {
-        for(const stage of contest.getCurrentLeg().stages) {
-            stagesToOmit.push(stage);
-        }
-    }
     if(RallyID !== 6){
+        stages = contest.rallies[RallyID].stages;
+        if(!hasLegFinished(stages[stages.length - 1])) {
+            for(const stage of contest.getCurrentLeg().stages) {
+                stagesToOmit.push(stage);
+            }
+        }
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables, 0) 
         }
         contest.rallies[RallyID].getSummary(nParticipants, stagesToOmit).CreateContestEntireStageTable(summaryDiv, 1)
     }
     else{
+        for(const rally of contest.rallies) {
+            if(!hasLegFinished(rally.stages[rally.stages.length - 1])) {
+                for(const stage of contest.getCurrentLeg().stages) {
+                    stagesToOmit.push(stage);
+                }
+                break;
+            }
+        }
+        contest.finish(stagesToOmit)
+        contest.AddRally(contest.summaryRally);
+        console.log("FinalSummary")
+        stages = contest.summaryRally.stages;
         for(let i = 0; i< stages.length; i++){
             stages[i].CreateContestEntireStageTable(tables,2)
         }
