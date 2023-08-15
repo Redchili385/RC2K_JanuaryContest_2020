@@ -80,11 +80,11 @@ function contestData(){
             stages: ["Pundershaw"]
         },
         {
-            date: new Date("2023-08-14T20:00:00Z"),
+            date: new Date("2023-08-14T21:00:00Z"),
             stages: ["Riccarton", "Newcastleton"]
         },
         {
-            date: new Date("2023-08-15T20:00:00Z"),
+            date: new Date("2023-08-15T21:00:00Z"),
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
