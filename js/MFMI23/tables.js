@@ -229,7 +229,7 @@ class Contest{
     };
     finish(stagesToOmit = []){
         this.rallies.forEach(rally => rally.finish())
-        this.getFinalSummary(stagesToOmit).finish()
+        this.getFinalSummary(stagesToOmit).finish(6)
     }
 }
 
@@ -298,8 +298,8 @@ class Rally{
         })
         return this.wr
     }
-    finish(){
-        this.stages.forEach(stage => stage.finish())
+    finish(finalLevel = 0){
+        this.stages.forEach(stage => stage.finish(finalLevel))
         this.getWorldRecords()
         this.getSummary()
     }
@@ -514,11 +514,11 @@ class Stage{
         }
         return this.imageURL;
     }
-    finish(){
+    finish(finalLevel){
         this.sortWorldRecords()
         Record.sortByFinalTime(this.records)
         if(typeof this.id !== "undefined"){  //refactor
-            Record.assignStageRanks(this.records)
+            Record.assignStageRanks(this.records, finalLevel)
         }
         Record.generateGaps(this.records)
     }
@@ -577,8 +577,8 @@ class Record{
             return (a.finalTime_wcbAdjusted.centiseconds - b.finalTime_wcbAdjusted.centiseconds)
         })
     }
-    static assignStageRanks(stageRecords){
-        const sortedStageRecords = Record.sortByFinalTime(stageRecords)
+    static assignStageRanks(stageRecords, finalLevel){
+        const sortedStageRecords = finalLevel === 6 ? Record.sortByFinalTime_wcbAdjusted(stageRecords) : Record.sortByFinalTime(stageRecords)
         sortedStageRecords.forEach((stageRecord, index) => {
             stageRecord.rank = index + 1
         })
