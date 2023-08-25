@@ -124,7 +124,7 @@ function contestData(){
             stages: ["Tholt-y-Will", "Injerbreck", "Cringle"]
         },
         {
-            date: new Date("2023-08-25T20:00:00Z"),
+            date: new Date("2023-08-28T20:00:00Z"),
             stages: []
         }
     ];

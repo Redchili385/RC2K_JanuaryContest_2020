@@ -174,17 +174,21 @@ class Contest{
         this.schedule = schedule;
     }
     getCurrentLeg() {
-        /* Return leg if the contest has finished */
-        const currentDate = new Date();
-        const lastLeg = contest.schedule[contest.schedule.length - 1];
-        if(currentDate > lastLeg.date) {
-            return lastLeg;
-        }
-        else {
-            return contest.schedule.find(leg => {
-                return isSameDay(leg.date, new Date());
-            });
-        }
+        /* Return last leg if the contest has finished */
+        // const currentDate = new Date();
+        // const lastLeg = contest.schedule[contest.schedule.length - 1];
+        // if(currentDate > lastLeg.date) {
+        //     return lastLeg;
+        // }
+        // else {
+            // return contest.schedule.find(leg => {
+            //     return isSameDay(leg.date, new Date());
+            // });
+            const startedLegs = contest.schedule.filter(leg => {
+                return leg.date <= new Date();
+            })
+            return startedLegs[startedLegs.length - 1];
+        // }
     }
     getLegOfStage(stage) {
         return contest.schedule.find(leg => {
