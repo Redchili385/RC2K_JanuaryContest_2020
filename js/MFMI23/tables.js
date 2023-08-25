@@ -174,9 +174,17 @@ class Contest{
         this.schedule = schedule;
     }
     getCurrentLeg() {
-        return contest.schedule.find(leg => {
-            return isSameDay(leg.date, new Date());
-        });
+        /* Return leg if the contest has finished */
+        const currentDate = new Date();
+        const lastLeg = contest.schedule[contest.schedule.length - 1];
+        if(currentDate > lastLeg.date) {
+            return lastLeg;
+        }
+        else {
+            return contest.schedule.find(leg => {
+                return isSameDay(leg.date, new Date());
+            });
+        }
     }
     getLegOfStage(stage) {
         return contest.schedule.find(leg => {
