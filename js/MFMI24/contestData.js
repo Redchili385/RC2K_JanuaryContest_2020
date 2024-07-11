@@ -3,7 +3,7 @@ function contestData(){
         website = websiteData()
         console.log(website);
     }
-    let contest  = new Contest("Magnetic Fields Memorial Invitational 2023");
+    let contest  = new Contest("Magnetic Fields Memorial Invitational 2024");
 
     let G1 = new Group(1);
     let G2 = new Group(2);

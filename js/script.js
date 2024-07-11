@@ -1,7 +1,7 @@
 let contest = contestData();
 let resultSyncPromise;
 
-if(contest.name === "Magnetic Fields Memorial Invitational 2023") {
+if(["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name)) {
     resultSyncPromise = retrieveContestData();    
 }
 main(contest);
@@ -60,7 +60,7 @@ async function main(contest) {
                 <td>${participant.num}</td>
                 <td>${participant.user.name}</td>
                 <td>${flagImg}</td>
-                <td>${contest.name === "Magnetic Fields Memorial Invitational 2023" ? contest.getGroupByNumber(participant.groupNumber).getName() : participant.group.name}</td>
+                <td>${["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name) ? contest.getGroupByNumber(participant.groupNumber).getName() : participant.group.name}</td>
                 <td>${participant.car}</td>
                 <td><button id="showModalBtn" class = "altBtn" onclick='showDriverProfile("${participant.user.name}")'>Show</button></td>
             </tr>`
@@ -135,7 +135,7 @@ function compareGroups(participant1, participant2) {
 function showDriverProfile(participantName) {
     const participant = contest.getParticipantByName(participantName);
     document.getElementById("modalDriverProfile").style.display = "flex";
-    let driverProfileImgFilename = `${contest.name === "Magnetic Fields Memorial Invitational 2023" ? contest.getGroupByNumber(participant.groupNumber).getName() : participant.group.name}_${participant.user.name}`;
+    let driverProfileImgFilename = `${["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name) ? contest.getGroupByNumber(participant.groupNumber).getName() : participant.group.name}_${participant.user.name}`;
     document.getElementById("driverProfileImg").setAttribute("src", `../../resources/driver_profiles/MFMI${contest.name.substr(-2, 2)}/${driverProfileImgFilename.toLowerCase().replaceAll(' ','')}.png`);
 }
 
@@ -338,7 +338,7 @@ function loadRallyTables(RallyID){
 }
 
 function hasLegFinished(stage) {
-    if(contest.name !== "Magnetic Fields Memorial Invitational 2023") {
+    if(!["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name)) {
         return true;
     }
     const currentLeg = contest.getCurrentLeg();
