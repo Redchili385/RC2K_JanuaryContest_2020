@@ -46,19 +46,19 @@ class Participant{
         this.groupNumber = null
         switch(car) {
             case "Mitsubishi Lancer Evo V":
-                this.wcbFactor = 1.05;
+                this.wcbFactor = 1.08;
                 break;
             case "Peugeot 206 WRC":
-                this.wcbFactor = 1.04;
+                this.wcbFactor = 1.12;
                 break;
             case "Subaru Impreza WRC":
-                this.wcbFactor = 1.03;
+                this.wcbFactor = 1.10;
                 break;
             case "Mitsubishi Lancer Evo IV":
-                this.wcbFactor = 1.02;
+                this.wcbFactor = 1.06;
                 break;
             case "Seat Cordoba WRC":
-                this.wcbFactor = 1.01;
+                this.wcbFactor = 1.04;
                 break;
             default:
                 this.wcbFactor = 1.00;
