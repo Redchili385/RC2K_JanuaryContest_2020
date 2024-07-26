@@ -15,33 +15,43 @@ function contestData(){
     let colorIndex = 0
     const participantColor = () => participantColors[colorIndex++];
 
-    let Erwto =         new Participant(20, website.GetUserByName('Erwto'),             participantColor(), 'Mitsubishi Lancer Evo IV');
-    let Migger =        new Participant(23, website.GetUserByName('Migger'),            participantColor(), 'Proton Wira/Persona');
-    let SpartaRemixer = new Participant(2,  website.GetUserByName('SpartaRemixer'),     participantColor(), 'Subaru Impreza WRC');
-    let Ephemeral =     new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Mitsubishi Lancer Evo IV');
-    let XsaraTorrada =  new Participant(69, website.GetUserByName('XsaraTorrada'),      participantColor(), 'Peugeot 206 WRC');
-    let Lewsys =        new Participant(14, website.GetUserByName('Lewsys'),            participantColor(), 'Peugeot 206 WRC');
-    let sBinnala =      new Participant(16, website.GetUserByName('sBinnala'),          participantColor(), 'Subaru Impreza WRC');
-    let Linotrix =      new Participant(2,  website.GetUserByName('Linotrix'),          participantColor(), 'Mitsubishi Lancer Evo IV');
-    let BrosTheThird =  new Participant(30, website.GetUserByName('BrosTheThird'),      participantColor(), 'Subaru Impreza WRC');
-    let datsun100aGTR = new Participant(90, website.GetUserByName('SForman135LS'),      participantColor(), 'Subaru Impreza WRC');
-    let Woeringen1288 = new Participant(7,  website.GetUserByName('Woeringen1288'),     participantColor(), 'Mitsubishi Lancer Evo V');
-    let Pendzior =      new Participant(8,  website.GetUserByName('Pendzior'),          participantColor(), 'Subaru Impreza WRC');
-    let KarelPipa =     new Participant(55, website.GetUserByName('Karel Pipa'),        participantColor(), 'Seat Cordoba WRC');
-    let TheKetrab =     new Participant(10, website.GetUserByName('TheKetrab'),         participantColor(), 'Mitsubishi Lancer Evo V');
-    let Twajlot =       new Participant(39, website.GetUserByName('Twajlot'),           participantColor(), 'Subaru Impreza WRC');
-    let Tribell =       new Participant(39, website.GetUserByName('Tribell'),           participantColor(), 'Peugeot 206 WRC');
-    let Red_T =         new Participant(19, website.GetUserByName('Red_T'),             participantColor(), 'Proton Wira/Persona');
-    let Certare =       new Participant(26, website.GetUserByName('Certare'),           participantColor(), 'Peugeot 206 WRC');
-    let Komuh =         new Participant(27, website.GetUserByName('Komuh'),             participantColor(), 'Seat Cordoba WRC');
-    let PKlima =        new Participant(77, website.GetUserByName('P. Klima'),          participantColor(), 'Mitsubishi Lancer Evo V');
-    let Kryspa7 =       new Participant(7,  website.GetUserByName('Kryspa7'),           participantColor(), 'Subaru Impreza WRC');
-    contest.participants.push(Erwto, Ephemeral, Lewsys, sBinnala, TheKetrab, datsun100aGTR, Tribell, Migger, SpartaRemixer, Red_T, Certare, /*Komuh,*/ Pendzior, XsaraTorrada, KarelPipa, PKlima, Kryspa7);
+    let Erwto =             new Participant(20, website.GetUserByName('Erwto'),             participantColor(), 'Subaru Impreza WRC');
+    let Ephemeral =         new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Mitsubishi Lancer Evo IV');
+    let SpartaRemixer =     new Participant(25, website.GetUserByName('SpartaRemixer'),     participantColor(), 'Subaru Impreza WRC');
+    let Lewsys =            new Participant(14, website.GetUserByName('Lewsys'),            participantColor(), 'Peugeot 206 WRC');
+    let sBinnala =          new Participant(16, website.GetUserByName('sBinnala'),          participantColor(), 'Seat Cordoba WRC');
+    let datsun100aGTR =     new Participant(90, website.GetUserByName('SForman135LS'),      participantColor(), 'Subaru Impreza WRC');
+    let Woeringen1288 =     new Participant(7,  website.GetUserByName('Woeringen1288'),     participantColor(), 'Mitsubishi Lancer Evo V');
+    let Pendzior =          new Participant(8,  website.GetUserByName('Pendzior'),          participantColor(), 'Seat Cordoba WRC');
+    let KarelPipa =         new Participant(55, website.GetUserByName('Karel Pipa'),        participantColor(), 'Seat Cordoba WRC');
+    let TheKetrab =         new Participant(10, website.GetUserByName('TheKetrab'),         participantColor(), 'Mitsubishi Lancer Evo V');
+    let Tribell =           new Participant(39, website.GetUserByName('Tribell'),           participantColor(), 'Mitusbishi Lancer Evo IV');
+    let Red_T =             new Participant(19, website.GetUserByName('Red_T'),             participantColor(), 'Proton Wira/Persona');
+    let PKlima =            new Participant(77, website.GetUserByName('P. Klima'),          participantColor(), 'Mitsubishi Lancer Evo V');
+    let Noni =              new Participant(77, website.GetUserByName('Noni'),              participantColor(), 'Peugeot 206 WRC');
+    let InfamousGhost07 =   new Participant(77, website.GetUserByName('InfamousGhost07'),   participantColor(), 'Peugeot 206 WRC');
+    contest.participants.push(
+        Erwto,
+        Ephemeral,
+        SpartaRemixer,
+        Lewsys,
+        sBinnala,
+        TheKetrab,
+        datsun100aGTR,
+        Tribell,
+        Red_T,
+        Pendzior,
+        KarelPipa,
+        PKlima,
+        Woeringen1288,
+        Noni,
+        InfamousGhost07
+    );
 
-    G1.addParticipants([Ephemeral, Komuh, SpartaRemixer, Tribell])
-    G2.addParticipants([Pendzior, TheKetrab, Migger, Erwto, Linotrix, Twajlot])
-    G3.addParticipants([XsaraTorrada, KarelPipa, Red_T, XsaraTorrada])
-    G4.addParticipants([Woeringen1288, BrosTheThird, datsun100aGTR, Certare, Lewsys, sBinnala, PKlima, Kryspa7])
+    G1.addParticipants([Ephemeral, Tribell, SpartaRemixer]);
+    G2.addParticipants([Pendzior, TheKetrab, Erwto, datsun100aGTR]);
+    G3.addParticipants([KarelPipa, Red_T]);
+    G4.addParticipants([Woeringen1288, Lewsys, sBinnala, PKlima, InfamousGhost07, Noni]);
 
     G1.participants.forEach(participant => participant.setGroup(G1));
     G2.participants.forEach(participant => participant.setGroup(G2));
