@@ -30,6 +30,7 @@ function contestData(){
     let PKlima =            new Participant(77, website.GetUserByName('P. Klima'),          participantColor(), 'Mitsubishi Lancer Evo V');
     let Noni =              new Participant(77, website.GetUserByName('Noni'),              participantColor(), 'Peugeot 206 WRC');
     let InfamousGhost07 =   new Participant(77, website.GetUserByName('InfamousGhost07'),   participantColor(), 'Peugeot 206 WRC');
+    let BrosTheThird =      new Participant(30, website.GetUserByName('BrosTheThird'),      participantColor(), 'Subaru Impreza WRC');
     contest.participants.push(
         Erwto,
         Ephemeral,
@@ -45,13 +46,14 @@ function contestData(){
         PKlima,
         Woeringen1288,
         Noni,
-        InfamousGhost07
+        InfamousGhost07,
+        BrosTheThird
     );
 
     G1.addParticipants([Ephemeral, Tribell, SpartaRemixer]);
     G2.addParticipants([Pendzior, TheKetrab, Erwto, datsun100aGTR]);
     G3.addParticipants([KarelPipa, Red_T]);
-    G4.addParticipants([Woeringen1288, Lewsys, sBinnala, PKlima, InfamousGhost07, Noni]);
+    G4.addParticipants([Woeringen1288, Lewsys, sBinnala, PKlima, InfamousGhost07, Noni, BrosTheThird]);
 
     G1.participants.forEach(participant => participant.setGroup(G1));
     G2.participants.forEach(participant => participant.setGroup(G2));
