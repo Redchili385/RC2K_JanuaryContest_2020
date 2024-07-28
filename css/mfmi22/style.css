@@ -108,6 +108,10 @@ body{
     mix-blend-mode:darken;
 }
 
+#prev-btn {
+    visibility: hidden;
+}
+
 .book {
     position: relative;
     width: 525px;

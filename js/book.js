@@ -14,14 +14,18 @@ function openBook() {
     book.style.transform = "translateX(50%)";
     prevBtn.style.transform = "translateX(-300px)";
     nextBtn.style.transform = "translateX(300px)";
+    prevBtn.style.visibility = "visible";
+    nextBtn.style.visibility = "visible";
 }
 
 function closeBook(isAtBeggining) {
     if(isAtBeggining) {
         book.style.transform = "translateX(0%)";
+        prevBtn.style.visibility = "hidden";
     }
     else {
         book.style.transform = "translateX(100%)";
+        nextBtn.style.visibility = "hidden";
     }
     prevBtn.style.transform = "translateX(0px)";
     nextBtn.style.transform = "translateX(0px)";
