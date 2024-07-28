@@ -32,7 +32,7 @@ function websiteData(){
         new User('P. Klima', "pl"),
         new User('Kryspa7', "pl"),
         new User('Noni', "es"),
-        new User('InfamousGhost07', "uk")
+        new User('InfamousGhost07', "en")
     );
 
     let Spartax = website.GetUserByName("SpartaX18");
