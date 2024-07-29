@@ -187,7 +187,7 @@ class Contest{
             const startedLegs = contest.schedule.filter(leg => {
                 return leg.date <= new Date();
             })
-            return startedLegs[startedLegs.length - 1];
+            return (startedLegs.length === 0 ) ? {date: new Date(), stages: []} : startedLegs[startedLegs.length - 1];
         // }
     }
     getLegOfStage(stage) {

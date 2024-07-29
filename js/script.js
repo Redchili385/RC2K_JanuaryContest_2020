@@ -341,7 +341,11 @@ function hasLegFinished(stage) {
     if(!["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name)) {
         return true;
     }
+    console.log(contest)
     const currentLeg = contest.getCurrentLeg();
+    if(currentLeg === null) {
+        return false;
+    }
     const legOfThisStage = contest.getLegOfStage(stage);
     return legOfThisStage.date < currentLeg.date;
 }
