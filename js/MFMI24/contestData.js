@@ -16,7 +16,7 @@ function contestData(){
     const participantColor = () => participantColors[colorIndex++];
 
     let Erwto =             new Participant(20, website.GetUserByName('Erwto'),             participantColor(), 'Subaru Impreza WRC');
-    let Ephemeral =         new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Mitsubishi Lancer Evo IV');
+    let Ephemeral =         new Participant(25, website.GetUserByName('Ephemeral'),         participantColor(), 'Peugeot 206 WRC');
     let SpartaRemixer =     new Participant(2,  website.GetUserByName('SpartaRemixer'),     participantColor(), 'Subaru Impreza WRC');
     let Lewsys =            new Participant(14, website.GetUserByName('Lewsys'),            participantColor(), 'Peugeot 206 WRC');
     let sBinnala =          new Participant(16, website.GetUserByName('sBinnala'),          participantColor(), 'Seat Cordoba WRC');
@@ -64,79 +64,79 @@ function contestData(){
     
     const schedule = [
         {
-            date: new Date("2024-08-14T18:00:00Z"),
+            date: new Date("2024-07-30T18:00:00Z"),
             stages: ["Clocaenog Mid", "Penmachno South"]
         },
         {
-            date: new Date("2024-08-15T18:00:00Z"),
+            date: new Date("2024-07-31T18:00:00Z"),
             stages: ["Myherin", "Hafren"]
         },
         {
-            date: new Date("2024-08-16T18:00:00Z"),
+            date: new Date("2024-08-01T18:00:00Z"),
             stages: ["Dyfi", "Gartheiniog"]
         },
         {
-            date: new Date("2024-08-17T18:00:00Z"),
+            date: new Date("2024-08-02T18:00:00Z"),
             stages: ["Chirdonhead"]
         },
         {
-            date: new Date("2024-08-18T18:00:00Z"),
+            date: new Date("2024-08-03T18:00:00Z"),
             stages: ["Falstone"]
         },
         {
-            date: new Date("2024-08-19T18:00:00Z"),
+            date: new Date("2024-08-04T18:00:00Z"),
             stages: ["Kershope"]
         },
         {
-            date: new Date("2024-08-20T18:00:00Z"),
+            date: new Date("2024-08-05T18:00:00Z"),
             stages: ["Pundershaw"]
         },
         {
-            date: new Date("2024-08-21T18:00:00Z"),
+            date: new Date("2024-08-06T18:00:00Z"),
             stages: ["Riccarton", "Newcastleton"]
         },
         {
-            date: new Date("2024-08-22T18:00:00Z"),
+            date: new Date("2024-08-07T18:00:00Z"),
             stages: ["Twiglees", "Yair", "Cardrona"]
         },
         {
-            date: new Date("2024-08-23T18:00:00Z"),
+            date: new Date("2024-08-08T18:00:00Z"),
             stages: ["Black Loch", "Glentrool"]
         },
         {
-            date: new Date("2024-08-24T18:00:00Z"),
+            date: new Date("2024-08-09T18:00:00Z"),
             stages: ["Ae"]
         },
         {
-            date: new Date("2024-08-25T18:00:00Z"),
+            date: new Date("2024-08-10T18:00:00Z"),
             stages: ["Moon and Star", "Bothwell", "Whitchester"]
         },
         {
-            date: new Date("2024-08-26T18:00:00Z"),
+            date: new Date("2024-08-11T18:00:00Z"),
             stages: ["Eccles", "Langton", "Fogo"]
         },
         {
-            date: new Date("2024-08-27T18:00:00Z"),
+            date: new Date("2024-08-12T18:00:00Z"),
             stages: ["Hamilton's Folly", "Tyrones Ditches"]
         },
         {
-            date: new Date("2024-08-28T18:00:00Z"),
+            date: new Date("2024-08-13T18:00:00Z"),
             stages: ["Feeney", "Parkanaur"]
         },
         {
-            date: new Date("2024-08-29T18:00:00Z"),
+            date: new Date("2024-08-14T18:00:00Z"),
             stages: ["Lisnamuck", "Tardree"]
         },
         {
-            date: new Date("2024-08-30T18:00:00Z"),
+            date: new Date("2024-08-15T18:00:00Z"),
             stages: ["Port Soderick", "Ballagyr", "Curraghs"]
         },
         {
-            date: new Date("2024-08-31T18:00:00Z"),
+            date: new Date("2024-08-16T18:00:00Z"),
             stages: ["Tholt-y-Will", "Injerbreck", "Cringle"]
         },
         {
-            date: new Date("2024-09-01T18:00:00Z"),
+            date: new Date("2024-09-17T18:00:00Z"),
             stages: []
         }
     ];
