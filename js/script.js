@@ -41,7 +41,6 @@ async function retrieveContestData() {
 
 async function main(contest) {
     console.log("Reading script.js")
-    console.log(contest)
     bgRoll();
 
     document.getElementById("title").innerHTML = contest.name
@@ -341,7 +340,6 @@ function hasLegFinished(stage) {
     if(!["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name)) {
         return true;
     }
-    console.log(contest)
     const currentLeg = contest.getCurrentLeg();
     if(currentLeg === null) {
         return false;
