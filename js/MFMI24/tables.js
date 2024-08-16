@@ -592,6 +592,15 @@ class Record{
     static assignStageRanks(stageRecords, finalLevel){
         const sortedStageRecords = finalLevel === 6 ? Record.sortByFinalTime_wcbAdjusted(stageRecords) : Record.sortByFinalTime(stageRecords)
         sortedStageRecords.forEach((stageRecord, index) => {
+            if(index == 0){
+                stageRecord.rank = 1;
+                return;
+            }
+            let lastStageRecord = sortedStageRecords[index-1]
+            if(!stageRecord.status.didFinish && !lastStageRecord.status.didFinish){
+                stageRecord.rank = lastStageRecord.rank;
+                return;
+            }
             stageRecord.rank = index + 1
         })
         return sortedStageRecords
