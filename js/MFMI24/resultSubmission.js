@@ -176,97 +176,126 @@ function generateFormContent(form, currentLeg) {
             const participant_name = select_driver.options[select_driver.selectedIndex].text;
             const ref = firebase.storage().ref();
             
-            const sendResultsToFirebase = new Promise((resolve, reject) => {
-                const promises = [];
-                Array.from(stageFieldsets).forEach(fieldset => {
-                    const stage = fieldset.getElementsByClassName("legend_stage")[0].textContent;
-                    const didNotFinish = fieldset.getElementsByClassName("input_dnf")[0].checked;
-                    const time_cs
-                        = parseInt(fieldset.getElementsByClassName("input_timeMin")[0].value) * 6000
-                        + parseInt(fieldset.getElementsByClassName("input_timeSec")[0].value) * 100
-                        + parseInt(fieldset.getElementsByClassName("input_timeCS")[0].value);
-                    const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
-                    const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
+            const submitResults = new Promise((resolve, reject) => sendResultsToFirebase(resolve, reject, stageFieldsets, participant_name, ref, p_successMsg, loadingIcon));
+            submitResults.catch(console.error);
+        }
+    });
+}
 
-                    // Text data goes to document collection
-                    const db = firestore.collection(stage);
-                    const textDataTransferTask = db.doc(participant_name).set({
-                        dnf: didNotFinish,
-                        dsq: false,
-                        time_cs: time_cs,
-                        penalty_cs: 0,
-                        twitch_link: twitch_link,
-                        yt_link: yt_link
-                    }).then(() => {
-                        console.log(stage + " data submission successful!");
-                    }).catch((error) => {
-                        alert("Something went wrong! Please try again.");
-                        console.log(error);
-                        return;
-                    });
-                    promises.push(textDataTransferTask);
+function sendResultsToFirebase(resolve, reject, stageFieldsets, participant_name, ref, p_successMsg, loadingIcon) {
+    const promises = [];
+    Array.from(stageFieldsets).forEach(fieldset => {
+        const stageName = fieldset.getElementsByClassName("legend_stage")[0].textContent;
+        const didNotFinish = fieldset.getElementsByClassName("input_dnf")[0].checked;
+        const time_cs
+            = parseInt(fieldset.getElementsByClassName("input_timeMin")[0].value) * 6000
+            + parseInt(fieldset.getElementsByClassName("input_timeSec")[0].value) * 100
+            + parseInt(fieldset.getElementsByClassName("input_timeCS")[0].value);
+        const twitch_link = fieldset.getElementsByClassName("input_twitchLink")[0].value
+        const yt_link = fieldset.getElementsByClassName("input_ytLink")[0].value;
 
-                    // Files go to storage
-                    const replay_file = {
-                        data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
-                        for: "replay"
-                    };
-                    const time_imgs = Array.from(fieldset.getElementsByClassName("input_timeImage")[0].files).map(file => ({
-                        data: file,
-                        for: "time"
-                    }));
-                    const service_area_img = {
-                        data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
-                        for: "serviceArea"
-                    };
-                    const files = [replay_file, ...time_imgs, service_area_img];
-                    files.forEach(file => {
-                        // If file was uploaded by the user, put it in the Firebase Storage
-                        if(file.data) {
-                            const fileName = stage + "/" + participant_name + "/" + file.for + "/" + file.data.name;
-                            const metadata = {
-                                contentType: file.data.type
-                            };
-                            const fileTransferTask = ref.child(fileName).put(file.data, metadata);
-                            fileTransferTask.then(snapshot => snapshot.ref.getDownloadURL())
-                                            .then((url) => {
-                                                console.log("File uploaded to " + url);
-                                            })
-                                            .catch(console.error);
-                            promises.push(fileTransferTask);
-                        }
-                    });
-                });
+        // Text data goes to document collection
 
-                // Update lastUpdated date in Firestore
-                const updateDate = firebase.firestore.Timestamp.fromDate(new Date());
-                const meta_collection = firestore.collection("metadata");
-                const lastUpdatedUpdateTask = meta_collection.doc("lastUpdated").set({
-                    date: updateDate
+        const db = firestore.collection(stageName);
+        const textDataTransferTask = db.doc(participant_name).set({
+            dnf: didNotFinish,
+            dsq: false,
+            time_cs: time_cs,
+            penalty_cs: 0,
+            twitch_link: twitch_link,
+            yt_link: yt_link
+        }).then(() => {
+            console.log(stageName + " data submission successful!");
+        }).catch((error) => {
+            alert("Something went wrong! Please try again.");
+            console.log(error);
+            return;
+        });
+        promises.push(textDataTransferTask);
+
+        // If DNF, automatically assign DNF to the remaining stages of the rally
+        if(didNotFinish) {
+            const currentRally = contest.getRallyByStageName(stageName);
+            const currentStageID = contest.getStageByName(stageName).id;
+            const currentStageAsObject = currentRally.stages.find(stage => stage.id === currentStageID);
+            const remainingStagesOfCurrentRally = currentRally.stages.slice(currentRally.stages.indexOf(currentStageAsObject) + 1);
+            for(const stage of remainingStagesOfCurrentRally) {
+                const db = firestore.collection(stage.name);
+                const textDataTransferTask = db.doc(participant_name).set({
+                    dnf: true,
+                    dsq: false,
+                    time_cs: 0,
+                    penalty_cs: 0,
+                    twitch_link: "",
+                    yt_link: ""
                 }).then(() => {
-                    console.log("Database update registered!");
+                    console.log(stage.name + " data submission successful!");
                 }).catch((error) => {
-                    alert("Database update failed!");
+                    alert("Something went wrong! Please try again.");
                     console.log(error);
                     return;
                 });
-                promises.push(lastUpdatedUpdateTask);
-                // localStorage.setItem("lastUpdated", updateDate.toString())
-
-                Promise.all(promises)
-                .then(() => {
-                    loadingIcon.style.display = "none";
-                    p_successMsg.style.display = "inline";
-                    resolve();
-                })
-                .catch(error => {
-                    alert("Something went wrong! Please try again.");
-                    console.log(error);
-                    reject(error);
-                });
-            });
-            sendResultsToFirebase.catch(console.error);
+                promises.push(textDataTransferTask);
+            }
         }
+
+        // Files go to storage
+        const replay_file = {
+            data: fieldset.getElementsByClassName("input_replayFile")[0].files[0],
+            for: "replay"
+        };
+        const time_imgs = Array.from(fieldset.getElementsByClassName("input_timeImage")[0].files).map(file => ({
+            data: file,
+            for: "time"
+        }));
+        const service_area_img = {
+            data: fieldset.getElementsByClassName("input_serviceAreaImage")[0].files[0],
+            for: "serviceArea"
+        };
+        const files = [replay_file, ...time_imgs, service_area_img];
+        files.forEach(file => {
+            // If file was uploaded by the user, put it in the Firebase Storage
+            if(file.data) {
+                const fileName = stageName + "/" + participant_name + "/" + file.for + "/" + file.data.name;
+                const metadata = {
+                    contentType: file.data.type
+                };
+                const fileTransferTask = ref.child(fileName).put(file.data, metadata);
+                fileTransferTask.then(snapshot => snapshot.ref.getDownloadURL())
+                                .then((url) => {
+                                    console.log("File uploaded to " + url);
+                                })
+                                .catch(console.error);
+                promises.push(fileTransferTask);
+            }
+        });
+    });
+
+    // Update lastUpdated date in Firestore
+    const updateDate = firebase.firestore.Timestamp.fromDate(new Date());
+    const meta_collection = firestore.collection("metadata");
+    const lastUpdatedUpdateTask = meta_collection.doc("lastUpdated").set({
+        date: updateDate
+    }).then(() => {
+        console.log("Database update registered!");
+    }).catch((error) => {
+        alert("Database update failed!");
+        console.log(error);
+        return;
+    });
+    promises.push(lastUpdatedUpdateTask);
+    // localStorage.setItem("lastUpdated", updateDate.toString())
+
+    Promise.all(promises)
+    .then(() => {
+        loadingIcon.style.display = "none";
+        p_successMsg.style.display = "inline";
+        resolve();
+    })
+    .catch(error => {
+        alert("Something went wrong! Please try again.");
+        console.log(error);
+        reject(error);
     });
 }
 
