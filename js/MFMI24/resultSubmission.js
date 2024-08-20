@@ -337,8 +337,22 @@ function generateFormField(labelText, domId, domClass, inputType, placeholder) {
 }
 
 function toggleDNFCheckbox(checkbox) {
-    Array.from(checkbox.parentNode.parentNode.querySelectorAll(".input_time")).forEach(input_time => {
-        if(checkbox.checked) {
+    // Toggle all remaining DNF checkboxes, because DNF on a stage means DNF from all subsequent stages of the current rally
+    const dnfInputs = Array.from(document.getElementsByClassName("input_dnf"));
+    const toggledDnfInput = dnfInputs.find(dnfInput => dnfInput.id === checkbox.id);
+    const remainingDnfInputs = dnfInputs.slice(dnfInputs.indexOf(toggledDnfInput) + 1);
+
+    disableTimeInput(checkbox);
+    for(const dnfInput of remainingDnfInputs) {
+        dnfInput.checked = checkbox.checked;
+        dnfInput.disabled = checkbox.checked;
+        disableTimeInput(dnfInput)
+    }
+}
+
+function disableTimeInput(dnfInput) {
+    Array.from(dnfInput.parentNode.parentNode.querySelectorAll(".input_time")).forEach(input_time => {
+        if(dnfInput.checked) {
             input_time.setAttribute("disabled", "");
             input_time.value = "";
         }
