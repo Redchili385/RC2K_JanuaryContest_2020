@@ -597,7 +597,7 @@ class Record{
                 return;
             }
             let lastStageRecord = sortedStageRecords[index-1]
-            if(!stageRecord.status.didFinish && !lastStageRecord.status.didFinish){
+            if(!stageRecord.status.didFinish && !lastStageRecord.status.didFinish || stageRecord.finalTime.centiseconds === lastStageRecord.finalTime.centiseconds){
                 stageRecord.rank = lastStageRecord.rank;
                 return;
             }
