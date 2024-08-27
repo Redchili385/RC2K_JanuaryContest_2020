@@ -1,5 +1,6 @@
 let contest = contestData();
 let resultSyncPromise;
+let chart, chart_record;
 
 if(["Magnetic Fields Memorial Invitational 2023", "Magnetic Fields Memorial Invitational 2024"].includes(contest.name)) {
     resultSyncPromise = retrieveContestData();    
@@ -201,7 +202,10 @@ function loadRallyTables(RallyID){
         }
         contest.rallies[RallyID].getSummary(nParticipants, stagesToOmit).CreateContestEntireStageTable(summaryDiv, 3)
     }
-   
+    handleCharts(stages)
+}
+
+function handleCharts(stages) {
     //CHART.js 
     let stage_minimum = []
     let participants_centiseconds = []
@@ -318,7 +322,6 @@ function loadRallyTables(RallyID){
             }
         }
     }
-    let chart, chart_record
     if(typeof(chart) !== "undefined"){
         chart.data = data
         chart.update();
@@ -333,7 +336,8 @@ function loadRallyTables(RallyID){
     }
     else{
         chart_record = new Chart(ctx_record, Data_record);
-    } 
+    }
+
 }
 
 function hasLegFinished(stage) {
