@@ -358,7 +358,7 @@ body{
     border-top: none;
 }
 
-.tables table td, #tables table th{
+.tables table td, .tables table th{
     vertical-align: middle;
 }
 
